@@ -1,117 +1,68 @@
 import { gql } from "@apollo/client";
 
+const VEHICLE_TYPE_FRAGMENT = gql`
+  fragment VehicleTypeFragment on VehicleType {
+    id
+    formFactor
+    propulsionType
+    maxRangeMeters
+    name
+  }
+`;
+
+const PRICING_SEGMENT_FRAGMENT = gql`
+  fragment PricingSegmentFragment on PricingSegment {
+    start
+    rate
+    interval
+    end
+  }
+`;
+
+const PRICING_PLAN_FRAGMENT = gql`
+  fragment PricingPlanFragment on PricingPlan {
+    id
+    url
+    name
+    currency
+    price
+    isTaxable
+    description
+    perKmPricing {
+      ...PricingSegmentFragment
+    }
+    perMinPricing {
+      ...PricingSegmentFragment
+    }
+    surgePricing
+  }
+  ${PRICING_SEGMENT_FRAGMENT}
+`;
+
 const VEHICLE_FRAGMENT = gql`
-  fragment VehicleFragment on VehicleUpdate {
-    vehicleRef
-    codespace {
-      codespaceId
+  fragment VehicleFragment on Vehicle {
+    id
+    lat
+    lon
+    isReserved
+    isDisabled
+    currentRangeMeters
+    vehicleType {
+      ...VehicleTypeFragment
     }
-    operator {
-      operatorRef
-    }
-    line {
-      lineName
-      lineRef
-    }
-    serviceJourney {
-      serviceJourneyId
-    }
-    direction
-    mode
-    lastUpdated
-    lastUpdatedEpochSecond
-    expiration
-    expirationEpochSecond
-    speed
-    heading
-    monitored
-    delay
-    location {
-      latitude
-      longitude
+    pricingPlan {
+      ...PricingPlanFragment
     }
   }
+  ${VEHICLE_TYPE_FRAGMENT}
+  ${PRICING_PLAN_FRAGMENT}
 `;
 
 export const VEHICLES_QUERY = gql`
-  query VehiclesQuery(
-    $codespaceId: String
-    $lineRef: String
-    $serviceJourneyId: String
-    $operatorRef: String
-    $mode: VehicleModeEnumeration
-    $monitored: Boolean
-  ) {
-    vehicles(
-      codespaceId: $codespaceId
-      lineRef: $lineRef
-      serviceJourneyId: $serviceJourneyId
-      operatorRef: $operatorRef
-      mode: $mode
-      monitored: $monitored
-    ) {
+  query VehiclesQuery($lat: Float!, $lon: Float!, $range: Int!, $count: Int) {
+    vehicles(lat: $lat, lon: $lon, range: $range, count: $count) {
       ...VehicleFragment
     }
   }
   ${VEHICLE_FRAGMENT}
-`;
-
-export const VEHICLE_UPDATES_SUBSCRIPTION = gql`
-  subscription VehicleUpdates(
-    $codespaceId: String
-    $lineRef: String
-    $serviceJourneyId: String
-    $operatorRef: String
-    $mode: VehicleModeEnumeration
-    $monitored: Boolean
-    $bufferSize: Float
-    $bufferTime: Float
-  ) {
-    vehicleUpdates(
-      codespaceId: $codespaceId
-      lineRef: $lineRef
-      serviceJourneyId: $serviceJourneyId
-      operatorRef: $operatorRef
-      mode: $mode
-      monitored: $monitored
-      bufferSize: $bufferSize
-      bufferTime: $bufferTime
-    ) {
-      ...VehicleFragment
-    }
-  }
-  ${VEHICLE_FRAGMENT}
-`;
-
-export const CODESPACES_QUERY = gql`
-  query CodespacesQuery {
-    codespaces {
-      codespaceId
-    }
-  }
-`;
-
-export const OPERATORS_QUERY = gql`
-  query OperatorsQuery($codespaceId: String!) {
-    operators(codespaceId: $codespaceId) {
-      operatorRef
-    }
-  }
-`;
-
-export const LINES_QUERY = gql`
-  query LinesQuery($codespaceId: String) {
-    lines(codespaceId: $codespaceId) {
-      lineRef
-      lineName
-    }
-  }
-`;
-
-export const SERVICE_JOURNEYS_QUERY = gql`
-  query ServiceJourneysQuery($lineRef: String!) {
-    serviceJourneys(lineRef: $lineRef) {
-      serviceJourneyId
-    }
-  }
 `;

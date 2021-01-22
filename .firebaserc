@@ -1,7 +1,7 @@
 {
   "projects": {
-    "dev": "vehicle-map-demo-dev",
-    "staging": "vehicle-map-demo-staging",
-    "prod": "vehicle-map-demo-prod"
+    "dev": "mobility-map-demo-dev",
+    "staging": "mobility-map-demo-staging",
+    "prod": "mobility-map-demo-prod"
   }
 }

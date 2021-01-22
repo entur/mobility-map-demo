@@ -1,58 +1,50 @@
 import React, { useState } from "react";
 import { Map } from "../Map";
-import { ControlPanel } from "components/ControlPanel";
-import useVehicleData from "hooks/useVehicleData";
 import "./App.scss";
-import { Filter } from "model/filter";
+import useMapData from "hooks/useMapData";
+import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
+import { ControlPanel } from "components/ControlPanel";
 import { Options } from "model/options";
-import { SubscriptionOptions } from "model/subscriptionOptions";
-
-const defaultFilter: Filter = {
-  monitored: true,
-};
-
-const defaultSubscriptionOptions: SubscriptionOptions = {
-  enableLiveUpdates: true,
-  bufferSize: 20,
-  bufferTime: 250,
-};
 
 const defaultOptions: Options = {
-  sweepIntervalMs: 1000,
-  removeExpired: true,
-  removeExpiredAfterSeconds: 3600,
-  markInactive: true,
-  markInactiveAfterSeconds: 60,
+  radius: 30000,
+  mapStyle: "HEATMAP",
+};
+
+// Viewport settings
+const INITIAL_VIEW_STATE: InitialViewStateProps = {
+  longitude: 10.757933,
+  latitude: 59.911491,
+  zoom: 13,
+  pitch: 0,
+  bearing: 0,
 };
 
 export const App = () => {
-  const [filter, setFilter] = useState<Filter>(defaultFilter);
-  const [
-    subscriptionOptions,
-    setSubscriptionOptions,
-  ] = useState<SubscriptionOptions>(defaultSubscriptionOptions);
   const [options, setOptions] = useState<Options>(defaultOptions);
-  const { vehicles, statistics } = useVehicleData(
-    filter,
-    subscriptionOptions,
-    options
+  const [viewState, setViewState] = useState<InitialViewStateProps>(
+    INITIAL_VIEW_STATE
   );
+
+  const { vehicles, statistics } = useMapData(viewState, options.radius!);
 
   return (
     <div className="App">
       <div className="control-panel-wrapper">
         <ControlPanel
           statistics={statistics}
-          filter={filter}
-          setFilter={setFilter}
-          subscriptionOptions={subscriptionOptions}
-          setSubscriptionOptions={setSubscriptionOptions}
           options={options}
           setOptions={setOptions}
         />
       </div>
       <div className="map-wrapper">
-        <Map vehicles={vehicles} />
+        <Map
+          vehicles={vehicles}
+          viewState={viewState}
+          setViewState={setViewState}
+          radius={options.radius}
+          mapStyle={options.mapStyle}
+        />
       </div>
     </div>
   );

@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>json</string>
         <key>textureFileName</key>
-        <filename></filename>
+        <filename>icons.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
@@ -56,7 +56,7 @@
         <key>jxrCompressionLevel</key>
         <uint>0</uint>
         <key>ditherType</key>
-        <enum type="SettingsBase::DitherType">PngQuantLow</enum>
+        <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
         <key>backgroundColor</key>
         <uint>0</uint>
         <key>libGdx</key>
@@ -181,14 +181,10 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../../../../../Downloads/Bus 2 (1).png</key>
-            <key type="filename">../../../../../Downloads/Bus 2.png</key>
-            <key type="filename">../../../../../Downloads/Question 3 (1).png</key>
-            <key type="filename">../../../../../Downloads/Question 3.png</key>
-            <key type="filename">../../../../../Downloads/Subway 2 (1).png</key>
-            <key type="filename">../../../../../Downloads/Subway 2.png</key>
-            <key type="filename">../../../../../Downloads/Tram 1 (1).png</key>
-            <key type="filename">../../../../../Downloads/Tram 1.png</key>
+            <key type="filename">../../../../../../Downloads/Bicycle 1.svg</key>
+            <key type="filename">../../../../../../Downloads/BicycleParking 1.svg</key>
+            <key type="filename">../../../../../../Downloads/Car 1.svg</key>
+            <key type="filename">../../../../../../Downloads/Scooter 1.svg</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -197,59 +193,19 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>63,63,125,125</rect>
+                <rect>25,25,50,50</rect>
                 <key>scale9Paddings</key>
-                <rect>63,63,125,125</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../../../../../Downloads/Ferry 1 (1).png</key>
-            <key type="filename">../../../../../Downloads/Ferry 1.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>63,41,125,82</rect>
-                <key>scale9Paddings</key>
-                <rect>63,41,125,82</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../../../../../Downloads/Train 2 (1).png</key>
-            <key type="filename">../../../../../Downloads/Train 2.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>64,64,127,127</rect>
-                <key>scale9Paddings</key>
-                <rect>64,64,127,127</rect>
+                <rect>25,25,50,50</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
         </map>
         <key>fileList</key>
         <array>
-            <filename>../../../../../Downloads/Train 2.png</filename>
-            <filename>../../../../../Downloads/Subway 2.png</filename>
-            <filename>../../../../../Downloads/Bus 2.png</filename>
-            <filename>../../../../../Downloads/Ferry 1.png</filename>
-            <filename>../../../../../Downloads/Tram 1.png</filename>
-            <filename>../../../../../Downloads/Question 3.png</filename>
-            <filename>../../../../../Downloads/Bus 2 (1).png</filename>
-            <filename>../../../../../Downloads/Ferry 1 (1).png</filename>
-            <filename>../../../../../Downloads/Subway 2 (1).png</filename>
-            <filename>../../../../../Downloads/Train 2 (1).png</filename>
-            <filename>../../../../../Downloads/Tram 1 (1).png</filename>
-            <filename>../../../../../Downloads/Question 3 (1).png</filename>
+            <filename>../../../../../../Downloads/Bicycle 1.svg</filename>
+            <filename>../../../../../../Downloads/Car 1.svg</filename>
+            <filename>../../../../../../Downloads/Scooter 1.svg</filename>
+            <filename>../../../../../../Downloads/BicycleParking 1.svg</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

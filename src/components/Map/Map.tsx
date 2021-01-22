@@ -1,80 +1,65 @@
-import { useEffect, useState } from "react";
 import DeckGL from "@deck.gl/react";
-import { IconLayer } from "@deck.gl/layers";
-import { StaticMap, Popup, _MapContext as MapContext } from "react-map-gl";
-import { InitialViewStateProps, PickInfo } from "@deck.gl/core/lib/deck";
-import { Modal } from "@entur/modal";
-import { TertiaryButton } from "@entur/button";
-import { TooltipContent } from "./TooltipContent";
+import { IconLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { StaticMap, _MapContext as MapContext } from "react-map-gl";
 import { VehicleMapPoint } from "model/vehicleMapPoint";
-import { Vehicle } from "model/vehicle";
 import iconAtlas from "static/icons/icons.png";
 import iconMapping from "static/icons/icons.json";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
 const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_MAP_STYLE = process.env.REACT_APP_MAPBOX_MAP_STYLE;
 
-// Viewport settings
-const INITIAL_VIEW_STATE: InitialViewStateProps = {
-  longitude: 10.757933,
-  latitude: 59.911491,
-  zoom: 13,
-  pitch: 0,
-  bearing: 0,
-};
-
-export const Map = ({ vehicles }: any) => {
-  const [modalInfo, setModalInfo] = useState<Vehicle | null>(null);
-  const [popupInfo, setPopupInfo] = useState<Vehicle | null>(null);
-  const [hoverInfo, setHoverInfo] = useState<Vehicle | null>(null);
-  const [viewState, setViewState] = useState<InitialViewStateProps>(
-    INITIAL_VIEW_STATE
-  );
-
-  useEffect(() => {
-    if (popupInfo) {
-      const vehicleMapPoint: VehicleMapPoint = vehicles[popupInfo.vehicleRef];
-      if (vehicleMapPoint) {
-        if (
-          vehicleMapPoint.vehicle.location.longitude !==
-            popupInfo.location.longitude ||
-          vehicleMapPoint.vehicle.location.latitude !==
-            popupInfo.location.latitude
-        ) {
-          setPopupInfo(vehicleMapPoint.vehicle);
-          setViewState((v: InitialViewStateProps) => ({
-            ...v,
-            longitude: vehicleMapPoint.vehicle.location.longitude,
-            latitude: vehicleMapPoint.vehicle.location.latitude,
-          }));
-        }
-      }
-    }
-    // eslint-disable-next-line
-  }, [vehicles]);
-
-  const layers = [
-    new IconLayer<VehicleMapPoint>({
-      id: "icon-layer",
-      data: Object.values(vehicles),
-      pickable: true,
-      iconAtlas,
-      iconMapping,
-      getIcon: (d: VehicleMapPoint) => d.icon,
-      getSize: () => 50,
-      getPosition: (vehicleMapPoint: VehicleMapPoint) => [
-        vehicleMapPoint.vehicle.location.longitude,
-        vehicleMapPoint.vehicle.location.latitude,
-      ],
-      onClick: (info: PickInfo<VehicleMapPoint>) =>
-        setPopupInfo(info?.object?.vehicle),
-      onHover: (info: PickInfo<VehicleMapPoint>) =>
-        setHoverInfo(info?.object?.vehicle),
+export const Map = ({
+  vehicles,
+  viewState,
+  setViewState,
+  radius,
+  mapStyle,
+}: any) => {
+  const layers: any = [
+    new ScatterplotLayer({
+      id: "coverage-radius",
+      data: [{ position: [viewState.longitude, viewState.latitude] }],
+      pickable: false,
+      opacity: 0.1,
+      stroked: true,
+      filled: false,
+      lineWidthMinPixels: 1,
+      getPosition: (d: any) => d.position,
+      getRadius: (d) => radius,
+      getFillColor: (d) => [0, 0, 0],
+      getLineColor: (d) => [0, 0, 0],
     }),
   ];
+
+  if (mapStyle === "HEATMAP") {
+    layers.push(
+      new HeatmapLayer<VehicleMapPoint>({
+        id: "heatmap-layer",
+        data: Object.values(vehicles),
+        getPosition: (d) => [d.vehicle.lon, d.vehicle.lat],
+      })
+    );
+  } else if (mapStyle === "ICONS") {
+    layers.push(
+      new IconLayer<VehicleMapPoint>({
+        id: "icon-layer",
+        data: Object.values(vehicles),
+        pickable: true,
+        iconAtlas,
+        iconMapping,
+        getIcon: (d: VehicleMapPoint) => d.icon,
+        getSize: () => 25,
+        getPosition: (vehicleMapPoint: VehicleMapPoint) => [
+          vehicleMapPoint.vehicle.lon,
+          vehicleMapPoint.vehicle.lat,
+        ],
+      })
+    );
+  }
 
   return (
     <>
@@ -86,33 +71,6 @@ export const Map = ({ vehicles }: any) => {
         layers={layers}
         style={{ left: "400px", width: "calc(100% - 400px)" }}
       >
-        {popupInfo && (
-          <Popup
-            key="popup"
-            longitude={popupInfo.location.longitude}
-            latitude={popupInfo.location.latitude}
-            closeButton
-            closeOnClick
-            onClose={() => setPopupInfo(null)}
-          >
-            <TooltipContent
-              vehicle={popupInfo}
-              onShowModalClick={setModalInfo}
-              full
-            />
-          </Popup>
-        )}
-        {!popupInfo && hoverInfo && (
-          <Popup
-            key="hover"
-            closeButton={false}
-            longitude={hoverInfo.location.longitude}
-            latitude={hoverInfo.location.latitude}
-            anchor="bottom"
-          >
-            <TooltipContent vehicle={hoverInfo} />
-          </Popup>
-        )}
         <StaticMap
           key="map"
           width="100%"
@@ -127,21 +85,6 @@ export const Map = ({ vehicles }: any) => {
             : { mapStyle: DEFAULT_STYLE })}
         />
       </DeckGL>
-      <Modal
-        open={!!modalInfo}
-        onDismiss={() => setModalInfo(null)}
-        title="Vehicle JSON"
-        size="medium"
-      >
-        <pre>{JSON.stringify(modalInfo, null, 2)}</pre>
-        <TertiaryButton
-          onClick={() =>
-            navigator.clipboard.writeText(JSON.stringify(modalInfo, null, 2))
-          }
-        >
-          Copy to clipboard
-        </TertiaryButton>
-      </Modal>
     </>
   );
 };

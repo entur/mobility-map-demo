@@ -1,3 +1,3 @@
-# Vehicle Map Demo
+# Mobility Map Demo
 
-Web app to demonstrate usage of realtime vehicle data from Entur.
+Web app to demonstrate usage of micro mobility data from Entur.

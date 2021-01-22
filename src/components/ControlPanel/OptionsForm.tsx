@@ -1,7 +1,8 @@
 import { memo } from "react";
-import { Switch, TextField } from "@entur/form";
+import { SegmentedChoice, TextField } from "@entur/form";
 import { Heading4 } from "@entur/typography";
 import { Options } from "model/options";
+import { SegmentedControl } from "@entur/form";
 
 type Props = {
   options: Options;
@@ -11,55 +12,25 @@ type Props = {
 export const OptionsForm = memo(({ options, setOptions }: Props) => {
   return (
     <>
-      <Heading4>Other settings</Heading4>
-      <TextField
-        type="number"
-        label="Sweep interval (ms)"
-        value={options.sweepIntervalMs}
-        onChange={(event) =>
-          setOptions({
-            ...options,
-            sweepIntervalMs: parseInt(event.target.value),
-          })
+      <Heading4>Options</Heading4>
+      <SegmentedControl
+        label="Choose map style"
+        onChange={(selectedValue) =>
+          setOptions({ ...options, mapStyle: selectedValue })
         }
-      />
-      <Switch
-        checked={options.removeExpired}
-        onChange={(event) =>
-          setOptions({ ...options, removeExpired: event.target.checked })
-        }
+        selectedValue={options.mapStyle}
       >
-        Remove expired vehicles from map
-      </Switch>
+        <SegmentedChoice value="HEATMAP">Heatmap</SegmentedChoice>
+        <SegmentedChoice value="ICONS">Icons</SegmentedChoice>
+      </SegmentedControl>
       <TextField
-        style={{ display: !options.removeExpired ? "none" : "block" }}
         type="number"
-        label="after N seconds"
-        value={options.removeExpiredAfterSeconds}
+        label="Radius (in meters"
+        value={options.radius}
         onChange={(event) =>
           setOptions({
             ...options,
-            removeExpiredAfterSeconds: parseInt(event.target.value),
-          })
-        }
-      />
-      <Switch
-        checked={options.markInactive}
-        onChange={(event) =>
-          setOptions({ ...options, markInactive: event.target.checked })
-        }
-      >
-        Mark vehicles as inactive
-      </Switch>
-      <TextField
-        style={{ display: !options.markInactive ? "none" : "block" }}
-        type="number"
-        label="after N seconds"
-        value={options.markInactiveAfterSeconds}
-        onChange={(event) =>
-          setOptions({
-            ...options,
-            markInactiveAfterSeconds: parseInt(event.target.value),
+            radius: parseInt(event.target.value),
           })
         }
       />
