@@ -25,7 +25,7 @@ export const OptionsForm = memo(({ options, setOptions }: Props) => {
       </SegmentedControl>
       <TextField
         type="number"
-        label="Radius (in meters"
+        label="Radius (in meters)"
         value={options.radius}
         onChange={(event) =>
           setOptions({

@@ -14,8 +14,8 @@ export default function useVehicleData(
   const [state, dispatch] = useMapDataReducer();
   const client = useApolloClient();
 
-  const debouncedViewState = useDebounce(viewState, 500);
-  const debouncedRadius = useDebounce(radius, 500);
+  const debouncedViewState = useDebounce(viewState, 100);
+  const debouncedRadius = useDebounce(radius, 100);
 
   useEffect(() => {
     async function update() {

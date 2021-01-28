@@ -7,15 +7,15 @@ import { ControlPanel } from "components/ControlPanel";
 import { Options } from "model/options";
 
 const defaultOptions: Options = {
-  radius: 30000,
-  mapStyle: "HEATMAP",
+  radius: 10000,
+  mapStyle: "ICONS",
 };
 
 // Viewport settings
 const INITIAL_VIEW_STATE: InitialViewStateProps = {
   longitude: 10.757933,
   latitude: 59.911491,
-  zoom: 13,
+  zoom: 12,
   pitch: 0,
   bearing: 0,
 };
