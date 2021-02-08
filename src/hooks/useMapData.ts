@@ -4,12 +4,14 @@ import { useEffect } from "react";
 import useMapDataReducer, { ActionType } from "./useMapDataReducer";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
 import useDebounce from "./useDebounce";
+import { Filter } from "model/filter";
 
 const DEFAULT_FETCH_POLICY = "no-cache";
 
 export default function useVehicleData(
   viewState: InitialViewStateProps,
-  radius: number
+  radius: number,
+  filter: Filter
 ) {
   const [state, dispatch] = useMapDataReducer();
   const client = useApolloClient();
@@ -26,6 +28,7 @@ export default function useVehicleData(
           lat: debouncedViewState.latitude,
           lon: debouncedViewState.longitude,
           range: debouncedRadius,
+          ...filter,
         },
       });
       if (hydrationData && hydrationData.vehicles) {
@@ -44,7 +47,7 @@ export default function useVehicleData(
     return () => {
       clearInterval(timer);
     };
-  }, [client, dispatch, debouncedViewState, debouncedRadius]);
+  }, [client, dispatch, debouncedViewState, debouncedRadius, filter]);
 
   return state;
 }

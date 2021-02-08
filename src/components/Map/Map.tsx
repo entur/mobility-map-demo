@@ -1,11 +1,14 @@
 import DeckGL from "@deck.gl/react";
 import { IconLayer, ScatterplotLayer } from "@deck.gl/layers";
-import { StaticMap, _MapContext as MapContext } from "react-map-gl";
+import { Popup, StaticMap, _MapContext as MapContext } from "react-map-gl";
 import { VehicleMapPoint } from "model/vehicleMapPoint";
 import iconAtlas from "static/icons/icons.png";
 import iconMapping from "static/icons/icons.json";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers";
+import { useState } from "react";
+import { PickInfo } from "@deck.gl/core/lib/deck";
+import { Vehicle } from "model/vehicle";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
@@ -19,6 +22,8 @@ export const Map = ({
   radius,
   mapStyle,
 }: any) => {
+  const [hoverInfo, setHoverInfo] = useState<Vehicle | null>(null);
+
   const layers: any = [
     new ScatterplotLayer({
       id: "coverage-radius",
@@ -57,6 +62,8 @@ export const Map = ({
           vehicleMapPoint.vehicle.lon,
           vehicleMapPoint.vehicle.lat,
         ],
+        onHover: (info: PickInfo<VehicleMapPoint>) =>
+          setHoverInfo(info?.object?.vehicle),
       })
     );
   }
@@ -71,6 +78,17 @@ export const Map = ({
         layers={layers}
         style={{ left: "400px", width: "calc(100% - 400px)" }}
       >
+        {hoverInfo && (
+          <Popup
+            key="hover"
+            closeButton={false}
+            longitude={hoverInfo.lon}
+            latitude={hoverInfo.lat}
+            anchor="bottom"
+          >
+            {hoverInfo.id}
+          </Popup>
+        )}
         <StaticMap
           key="map"
           width="100%"

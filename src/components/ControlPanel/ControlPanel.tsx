@@ -6,11 +6,15 @@ import { StatisticsList } from "./StatisticsList";
 import { OptionsForm } from "./OptionsForm";
 import logo from "static/img/logo.png";
 import "./ControlPanel.scss";
+import { Filter } from "model/filter";
+import { FiltersForm } from "./FiltersForm";
 
 type Props = {
   statistics: Statistics;
   options: Options;
   setOptions: (options: Options) => void;
+  filter: Filter;
+  setFilter: (filter: Filter) => void;
 };
 
 export const ControlPanel = memo((props: Props) => {
@@ -27,6 +31,10 @@ export const ControlPanel = memo((props: Props) => {
 
       <div className="control-panel-content">
         <OptionsForm options={props.options} setOptions={props.setOptions} />
+      </div>
+
+      <div className="control-panel-content">
+        <FiltersForm filter={props.filter} setFilter={props.setFilter} />
       </div>
     </Contrast>
   );

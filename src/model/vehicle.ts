@@ -18,18 +18,18 @@ export type VehicleType = {
 };
 
 export enum FormFactor {
-  BICYCLE,
-  CAR,
-  MOPED,
-  SCOOTER,
-  OTHER,
+  BICYCLE = "BICYCLE",
+  CAR = "CAR",
+  MOPED = "MOPED",
+  SCOOTER = "SCOOTER",
+  OTHER = "OTHER",
 }
 
 export enum PropulsionType {
-  HUMAN,
-  ELECTRIC_ASSIST,
-  ELECTRIC,
-  COMBUSTION,
+  HUMAN = "HUMAN",
+  ELECTRIC_ASSIST = "ELECTRIC_ASSIST",
+  ELECTRIC = "ELECTRIC_ASSIST",
+  COMBUSTION = "ELECTRIC_ASSIST",
 }
 
 export type PricingPlan = {
