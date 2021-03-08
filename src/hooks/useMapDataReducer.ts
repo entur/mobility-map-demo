@@ -29,7 +29,7 @@ const updateVehicles = (state: State, payload: Vehicle[]) => {
     (acc: Record<string, VehicleMapPoint>, vehicle: Vehicle) => {
       acc[vehicle.id] = {
         vehicle,
-        icon: "scooter",
+        icon: vehicle.vehicleType.formFactor.toLowerCase(),
       };
       return acc;
     },

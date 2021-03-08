@@ -1,69 +1,22 @@
 import { gql } from "@apollo/client";
 
-// const VEHICLE_TYPE_FRAGMENT = gql`
-//   fragment VehicleTypeFragment on VehicleType {
-//     id
-//     formFactor
-//     propulsionType
-//     maxRangeMeters
-//     name
-//   }
-// `;
-
-// const PRICING_SEGMENT_FRAGMENT = gql`
-//   fragment PricingSegmentFragment on PricingSegment {
-//     start
-//     rate
-//     interval
-//     end
-//   }
-// `;
-
-// const PRICING_PLAN_FRAGMENT = gql`
-//   fragment PricingPlanFragment on PricingPlan {
-//     id
-//     url
-//     name
-//     currency
-//     price
-//     isTaxable
-//     description
-//     perKmPricing {
-//       ...PricingSegmentFragment
-//     }
-//     perMinPricing {
-//       ...PricingSegmentFragment
-//     }
-//     surgePricing
-//   }
-//   ${PRICING_SEGMENT_FRAGMENT}
-// `;
-
-const VEHICLE_FRAGMENT_BASE = gql`
-  fragment VehicleFragmentBase on Vehicle {
-    id
-    lat
-    lon
+const VEHICLE_TYPE_FRAGMENT = gql`
+  fragment VehicleTypeFragment on VehicleType {
+    formFactor
   }
 `;
 
-// const VEHICLE_FRAGMENT = gql`
-//   fragment VehicleFragment on Vehicle {
-//     ...VehicleFragmentBase
-//     isReserved
-//     isDisabled
-//     currentRangeMeters
-//     vehicleType {
-//       ...VehicleTypeFragment
-//     }
-//     pricingPlan {
-//       ...PricingPlanFragment
-//     }
-//   }
-//   ${VEHICLE_FRAGMENT_BASE}
-//   ${VEHICLE_TYPE_FRAGMENT}
-//   ${PRICING_PLAN_FRAGMENT}
-// `;
+const VEHICLE_FRAGMENT = gql`
+  fragment VehicleFragment on Vehicle {
+    id
+    lat
+    lon
+    vehicleType {
+      ...VehicleTypeFragment
+    }
+  }
+  ${VEHICLE_TYPE_FRAGMENT}
+`;
 
 export const VEHICLES_QUERY = gql`
   query VehiclesQuery(
@@ -90,10 +43,10 @@ export const VEHICLES_QUERY = gql`
       includeReserved: $includeReserved
       includeDisabled: $includeDisabled
     ) {
-      ...VehicleFragmentBase
+      ...VehicleFragment
     }
   }
-  ${VEHICLE_FRAGMENT_BASE}
+  ${VEHICLE_FRAGMENT}
 `;
 
 export const CODESPACES_QUERY = gql`
