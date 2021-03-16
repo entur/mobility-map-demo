@@ -7,6 +7,8 @@ export type Vehicle = {
   currentRangeMeters: number;
   vehicleType: VehicleType;
   pricingPlan: PricingPlan;
+  rentalUris: RentalUris;
+  system: System;
 };
 
 export type VehicleType = {
@@ -50,4 +52,37 @@ export type PricingSegment = {
   rate: number;
   interval: number;
   end: number;
+};
+
+export type RentalUris = {
+  android: string;
+  ios: string;
+  web: string;
+};
+
+export type System = {
+  id: string;
+  language: string;
+  name: string;
+  shortName: string;
+  operator: string;
+  url: string;
+  purchaseUrl: string;
+  startDate: string;
+  phoneNumber: string;
+  email: string;
+  feedContactEmail: string;
+  timezone: string;
+  licenseUrl: string;
+  rentalApps: RentalApps;
+};
+
+export type RentalApps = {
+  ios: RentalApp;
+  android: RentalApp;
+};
+
+export type RentalApp = {
+  storeUri: string;
+  discoveryUri: string;
 };

@@ -36,7 +36,8 @@ export const App = () => {
   const { vehicles, statistics } = useMapData(
     viewState,
     options.radius!,
-    filter
+    filter,
+    options.mapStyle!
   );
 
   return (

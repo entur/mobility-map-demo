@@ -9,6 +9,7 @@ import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import { useState } from "react";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { Vehicle } from "model/vehicle";
+import { TooltipContent } from "./TooltipContent";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
@@ -86,7 +87,7 @@ export const Map = ({
             latitude={hoverInfo.lat}
             anchor="bottom"
           >
-            {hoverInfo.id}
+            <TooltipContent vehicle={hoverInfo} />
           </Popup>
         )}
         <StaticMap

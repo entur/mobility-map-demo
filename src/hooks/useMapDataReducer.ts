@@ -24,12 +24,15 @@ const initialState: State = {
   },
 };
 
-const updateVehicles = (state: State, payload: Vehicle[]) => {
+const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
   const vehicles = payload.reduce(
     (acc: Record<string, VehicleMapPoint>, vehicle: Vehicle) => {
       acc[vehicle.id] = {
         vehicle,
-        icon: vehicle.vehicleType.formFactor.toLowerCase(),
+        icon:
+          mapType === "ICONS"
+            ? vehicle.vehicleType.formFactor.toLowerCase()
+            : "",
       };
       return acc;
     },
@@ -45,13 +48,13 @@ const updateVehicles = (state: State, payload: Vehicle[]) => {
   };
 };
 
-const reducerFactory = () => (state: State, action: Action) => {
+const reducerFactory = (mapType: string) => (state: State, action: Action) => {
   switch (action.type) {
     case ActionType.UPDATE_VEHICLES:
-      return updateVehicles(state, action?.payload! as Vehicle[]);
+      return updateVehicles(state, action?.payload! as Vehicle[], mapType);
   }
 };
 
-export default function useVehicleReducer() {
-  return useReducer(reducerFactory(), initialState);
+export default function useVehicleReducer(mapType: string) {
+  return useReducer(reducerFactory(mapType), initialState);
 }
