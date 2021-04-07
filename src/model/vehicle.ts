@@ -1,3 +1,6 @@
+import { PricingPlan } from "./pricingPlan";
+import { System } from "./system";
+
 export type Vehicle = {
   id: string;
   lat: number;
@@ -34,55 +37,8 @@ export enum PropulsionType {
   COMBUSTION = "ELECTRIC_ASSIST",
 }
 
-export type PricingPlan = {
-  id: string;
-  url: string;
-  name: string;
-  currency: string;
-  price: number;
-  isTaxable: boolean;
-  description: string;
-  perKmPricing: [PricingSegment];
-  perMinPricing: [PricingSegment];
-  surgePricing: boolean;
-};
-
-export type PricingSegment = {
-  start: number;
-  rate: number;
-  interval: number;
-  end: number;
-};
-
 export type RentalUris = {
   android: string;
   ios: string;
   web: string;
-};
-
-export type System = {
-  id: string;
-  language: string;
-  name: string;
-  shortName: string;
-  operator: string;
-  url: string;
-  purchaseUrl: string;
-  startDate: string;
-  phoneNumber: string;
-  email: string;
-  feedContactEmail: string;
-  timezone: string;
-  licenseUrl: string;
-  rentalApps: RentalApps;
-};
-
-export type RentalApps = {
-  ios: RentalApp;
-  android: RentalApp;
-};
-
-export type RentalApp = {
-  storeUri: string;
-  discoveryUri: string;
 };

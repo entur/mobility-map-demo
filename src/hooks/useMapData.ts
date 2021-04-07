@@ -1,5 +1,9 @@
 import { useApolloClient } from "@apollo/client";
-import { FULL_VEHICLES_QUERY, VEHICLES_QUERY } from "api/graphql";
+import {
+  FULL_VEHICLES_QUERY,
+  STATIONS_QUERY,
+  VEHICLES_QUERY,
+} from "api/graphql";
 import { useEffect } from "react";
 import useMapDataReducer, { ActionType } from "./useMapDataReducer";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
@@ -17,14 +21,26 @@ export default function useVehicleData(
   const [state, dispatch] = useMapDataReducer(mapType);
   const client = useApolloClient();
 
-  const debouncedViewState = useDebounce(viewState, 100);
-  const debouncedRadius = useDebounce(radius, 100);
+  const debouncedViewState = useDebounce(viewState, 500);
+  const debouncedRadius = useDebounce(radius, 500);
 
-  const query = mapType === "HEATMAP" ? VEHICLES_QUERY : FULL_VEHICLES_QUERY;
+  let query = FULL_VEHICLES_QUERY;
+
+  switch (mapType) {
+    case "VEHICLE_HEATMAP":
+      query = VEHICLES_QUERY;
+      break;
+    case "VEHICLE_ICONS":
+      query = FULL_VEHICLES_QUERY;
+      break;
+    case "STATIONS":
+      query = STATIONS_QUERY;
+      break;
+  }
 
   useEffect(() => {
     async function update() {
-      const { data: hydrationData } = await client.query({
+      const { data } = await client.query({
         query: query,
         fetchPolicy: DEFAULT_FETCH_POLICY,
         variables: {
@@ -34,13 +50,19 @@ export default function useVehicleData(
           ...filter,
         },
       });
-      if (hydrationData && hydrationData.vehicles) {
+      if (data && data.vehicles) {
         dispatch({
           type: ActionType.UPDATE_VEHICLES,
-          payload: hydrationData.vehicles,
+          payload: data.vehicles,
+        });
+      } else if (data && data.stations) {
+        dispatch({
+          type: ActionType.UPDATE_STATIONS,
+          payload: data.stations,
         });
       }
     }
+
     update();
 
     const timer = setInterval(() => {

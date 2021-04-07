@@ -14,14 +14,17 @@ export const OptionsForm = memo(({ options, setOptions }: Props) => {
     <>
       <Heading4>Options</Heading4>
       <SegmentedControl
-        label="Choose map style"
+        label="Choose visualization"
         onChange={(selectedValue) =>
           setOptions({ ...options, mapStyle: selectedValue })
         }
         selectedValue={options.mapStyle}
       >
-        <SegmentedChoice value="HEATMAP">Heatmap</SegmentedChoice>
-        <SegmentedChoice value="ICONS">Icons</SegmentedChoice>
+        <SegmentedChoice value="VEHICLE_HEATMAP">
+          Vehicle heatmap
+        </SegmentedChoice>
+        <SegmentedChoice value="VEHICLE_ICONS">Vehicle icons</SegmentedChoice>
+        <SegmentedChoice value="STATIONS">Vehicle stations</SegmentedChoice>
       </SegmentedControl>
       <TextField
         type="number"

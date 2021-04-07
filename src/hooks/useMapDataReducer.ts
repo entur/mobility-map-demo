@@ -2,14 +2,18 @@ import { useReducer } from "react";
 import { Statistics } from "model/statistics";
 import { Vehicle } from "model/vehicle";
 import { VehicleMapPoint } from "model/vehicleMapPoint";
+import { Station } from "model/station";
+import { StationMapPoint } from "model/stationMapPoint";
 
 type State = {
   vehicles: Record<string, VehicleMapPoint>;
+  stations: Record<string, StationMapPoint>;
   statistics: Statistics;
 };
 
 export enum ActionType {
   UPDATE_VEHICLES,
+  UPDATE_STATIONS,
 }
 
 export type Action = {
@@ -19,6 +23,7 @@ export type Action = {
 
 const initialState: State = {
   vehicles: {},
+  stations: {},
   statistics: {
     numberOfVehicles: 0,
   },
@@ -30,7 +35,7 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
       acc[vehicle.id] = {
         vehicle,
         icon:
-          mapType === "ICONS"
+          mapType === "VEHICLE_ICONS"
             ? vehicle.vehicleType.formFactor.toLowerCase()
             : "",
       };
@@ -48,10 +53,30 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
   };
 };
 
+const updateStations = (state: State, payload: Station[]) => {
+  const stations = payload.reduce(
+    (acc: Record<string, StationMapPoint>, station: Station) => {
+      acc[station.id] = {
+        icon: "bicycle_parking",
+        station,
+      };
+      return acc;
+    },
+    {}
+  );
+
+  return {
+    ...state,
+    stations,
+  };
+};
+
 const reducerFactory = (mapType: string) => (state: State, action: Action) => {
   switch (action.type) {
     case ActionType.UPDATE_VEHICLES:
       return updateVehicles(state, action?.payload! as Vehicle[], mapType);
+    case ActionType.UPDATE_STATIONS:
+      return updateStations(state, action?.payload! as Station[]);
   }
 };
 

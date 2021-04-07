@@ -1,6 +1,11 @@
 import DeckGL from "@deck.gl/react";
 import { IconLayer, ScatterplotLayer } from "@deck.gl/layers";
-import { Popup, StaticMap, _MapContext as MapContext } from "react-map-gl";
+import {
+  Popup,
+  StaticMap,
+  _MapContext as MapContext,
+  Marker,
+} from "react-map-gl";
 import { VehicleMapPoint } from "model/vehicleMapPoint";
 import iconAtlas from "static/icons/icons.png";
 import iconMapping from "static/icons/icons.json";
@@ -10,6 +15,7 @@ import { useState } from "react";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { Vehicle } from "model/vehicle";
 import { TooltipContent } from "./TooltipContent";
+import { StationMapPoint } from "model/stationMapPoint";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
@@ -18,6 +24,7 @@ const MAPBOX_MAP_STYLE = process.env.REACT_APP_MAPBOX_MAP_STYLE;
 
 export const Map = ({
   vehicles,
+  stations,
   viewState,
   setViewState,
   radius,
@@ -41,7 +48,7 @@ export const Map = ({
     }),
   ];
 
-  if (mapStyle === "HEATMAP") {
+  if (mapStyle === "VEHICLE_HEATMAP") {
     layers.push(
       new HeatmapLayer<VehicleMapPoint>({
         id: "heatmap-layer",
@@ -49,7 +56,7 @@ export const Map = ({
         getPosition: (d) => [d.vehicle.lon, d.vehicle.lat],
       })
     );
-  } else if (mapStyle === "ICONS") {
+  } else if (mapStyle === "VEHICLE_ICONS") {
     layers.push(
       new IconLayer<VehicleMapPoint>({
         id: "icon-layer",
@@ -65,6 +72,22 @@ export const Map = ({
         ],
         onHover: (info: PickInfo<VehicleMapPoint>) =>
           setHoverInfo(info?.object?.vehicle),
+      })
+    );
+  } else if (mapStyle === "STATIONS") {
+    layers.push(
+      new IconLayer<StationMapPoint>({
+        id: "station-layer",
+        data: Object.values(stations),
+        pickable: false,
+        iconAtlas,
+        iconMapping,
+        getIcon: (d: StationMapPoint) => d.icon,
+        getSize: (d: StationMapPoint) => 50,
+        getPosition: (stationMapPoint: StationMapPoint) => [
+          stationMapPoint.station.lon,
+          stationMapPoint.station.lat,
+        ],
       })
     );
   }
@@ -90,6 +113,18 @@ export const Map = ({
             <TooltipContent vehicle={hoverInfo} />
           </Popup>
         )}
+        {stations &&
+          Object.values(stations).map((stationMapPoint: any) => {
+            return (
+              <Marker
+                key={stationMapPoint.station.id}
+                latitude={stationMapPoint.station.lat}
+                longitude={stationMapPoint.station.lon}
+              >
+                <p>{stationMapPoint.station.numBikesAvailable}</p>
+              </Marker>
+            );
+          })}
         <StaticMap
           key="map"
           width="100%"

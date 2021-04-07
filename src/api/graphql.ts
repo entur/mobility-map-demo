@@ -122,6 +122,54 @@ const VEHICLE_FRAGMENT = gql`
   ${SYSTEM_FRAGMENT}
 `;
 
+const STATION_FRAGMENT = gql`
+  fragment StationFragment on Station {
+    id
+    name
+    lat
+    lon
+    address
+    capacity
+    numBikesAvailable
+    numDocksAvailable
+    isInstalled
+    isRenting
+    isReturning
+    lastReported
+    system {
+      ...SystemFragment
+    }
+    pricingPlans {
+      ...PricingPlanFragment
+    }
+  }
+  ${PRICING_PLAN_FRAGMENT}
+  ${SYSTEM_FRAGMENT}
+`;
+
+export const STATIONS_QUERY = gql`
+  query StationsQuery(
+    $lat: Float!
+    $lon: Float!
+    $range: Int!
+    $count: Int
+    $codespaces: [String]
+    $operators: [String]
+  ) {
+    stations(
+      lat: $lat
+      lon: $lon
+      range: $range
+      count: $count
+      codespaces: $codespaces
+      operators: $operators
+    ) {
+      ...StationFragment
+    }
+  }
+  ${STATION_FRAGMENT}
+`;
+
 export const VEHICLES_QUERY = gql`
   query VehiclesQuery(
     $lat: Float!

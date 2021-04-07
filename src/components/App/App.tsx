@@ -9,7 +9,7 @@ import { Filter } from "model/filter";
 
 const defaultOptions: Options = {
   radius: 2500,
-  mapStyle: "ICONS",
+  mapStyle: "VEHICLE_ICONS",
 };
 
 const defaultFilter: Filter = {
@@ -33,7 +33,7 @@ export const App = () => {
     INITIAL_VIEW_STATE
   );
 
-  const { vehicles, statistics } = useMapData(
+  const { vehicles, stations, statistics } = useMapData(
     viewState,
     options.radius!,
     filter,
@@ -54,6 +54,7 @@ export const App = () => {
       <div className="map-wrapper">
         <Map
           vehicles={vehicles}
+          stations={stations}
           viewState={viewState}
           setViewState={setViewState}
           radius={options.radius}
