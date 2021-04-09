@@ -113,7 +113,7 @@ export const Map = ({
             <TooltipContent vehicle={hoverInfo} />
           </Popup>
         )}
-        {stations &&
+        {mapStyle === "STATIONS" &&
           Object.values(stations).map((stationMapPoint: any) => {
             return (
               <Marker
