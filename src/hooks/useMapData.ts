@@ -4,8 +4,8 @@ import {
   STATIONS_QUERY,
   VEHICLES_QUERY,
 } from "api/graphql";
-import { useEffect } from "react";
-import useMapDataReducer, { ActionType } from "./useMapDataReducer";
+import { useCallback, useEffect, useState } from "react";
+import useMapDataReducer, { ActionType, State } from "./useMapDataReducer";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
 import useDebounce from "./useDebounce";
 import { Filter } from "model/filter";
@@ -17,7 +17,8 @@ export default function useVehicleData(
   radius: number,
   filter: Filter,
   mapType: string
-) {
+): [State, boolean, () => void] {
+  const [loading, setLoading] = useState<boolean>(false);
   const [state, dispatch] = useMapDataReducer(mapType);
   const client = useApolloClient();
 
@@ -38,8 +39,12 @@ export default function useVehicleData(
       break;
   }
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
+    setLoading(true);
+    let abortController: AbortController | undefined;
     async function update() {
+      abortController = new AbortController();
+
       const { data } = await client.query({
         query: query,
         fetchPolicy: DEFAULT_FETCH_POLICY,
@@ -49,7 +54,13 @@ export default function useVehicleData(
           range: debouncedRadius,
           ...filter,
         },
+        context: {
+          fetchOptions: {
+            signal: abortController.signal,
+          },
+        },
       });
+      setLoading(false);
       if (data && data.vehicles) {
         dispatch({
           type: ActionType.UPDATE_VEHICLES,
@@ -63,16 +74,13 @@ export default function useVehicleData(
       }
     }
 
+    abortController?.abort();
     update();
-
-    const timer = setInterval(() => {
-      update();
-    }, 5000);
-
-    return () => {
-      clearInterval(timer);
-    };
   }, [client, dispatch, debouncedViewState, debouncedRadius, filter, query]);
 
-  return state;
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return [state, loading, refresh];
 }

@@ -33,7 +33,7 @@ export const App = () => {
     INITIAL_VIEW_STATE
   );
 
-  const { vehicles, stations, statistics } = useMapData(
+  const [{ vehicles, stations, statistics }, loading, refresh] = useMapData(
     viewState,
     options.radius!,
     filter,
@@ -49,6 +49,8 @@ export const App = () => {
           setOptions={setOptions}
           filter={filter}
           setFilter={setFilter}
+          loading={loading}
+          refresh={refresh}
         />
       </div>
       <div className="map-wrapper">

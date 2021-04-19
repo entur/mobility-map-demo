@@ -5,7 +5,7 @@ import { VehicleMapPoint } from "model/vehicleMapPoint";
 import { Station } from "model/station";
 import { StationMapPoint } from "model/stationMapPoint";
 
-type State = {
+export type State = {
   vehicles: Record<string, VehicleMapPoint>;
   stations: Record<string, StationMapPoint>;
   statistics: Statistics;

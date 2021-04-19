@@ -8,6 +8,7 @@ import logo from "static/img/logo.png";
 import "./ControlPanel.scss";
 import { Filter } from "model/filter";
 import { FiltersForm } from "./FiltersForm";
+import { PrimaryButton } from "@entur/button";
 
 type Props = {
   statistics: Statistics;
@@ -15,6 +16,8 @@ type Props = {
   setOptions: (options: Options) => void;
   filter: Filter;
   setFilter: (filter: Filter) => void;
+  loading: boolean;
+  refresh: () => void;
 };
 
 export const ControlPanel = memo((props: Props) => {
@@ -35,6 +38,12 @@ export const ControlPanel = memo((props: Props) => {
 
       <div className="control-panel-content">
         <FiltersForm filter={props.filter} setFilter={props.setFilter} />
+      </div>
+
+      <div className="control-panel-content">
+        <PrimaryButton loading={props.loading} onClick={() => props.refresh()}>
+          Refresh data
+        </PrimaryButton>
       </div>
     </Contrast>
   );
