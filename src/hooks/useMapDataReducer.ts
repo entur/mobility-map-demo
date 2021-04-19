@@ -14,6 +14,7 @@ export type State = {
 export enum ActionType {
   UPDATE_VEHICLES,
   UPDATE_STATIONS,
+  UPDATE_VEHICLES_AND_STATIONS,
 }
 
 export type Action = {
@@ -26,6 +27,7 @@ const initialState: State = {
   stations: {},
   statistics: {
     numberOfVehicles: 0,
+    numberOfStations: 0,
   },
 };
 
@@ -35,7 +37,7 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
       acc[vehicle.id] = {
         vehicle,
         icon:
-          mapType === "VEHICLE_ICONS"
+          mapType === "ICONS"
             ? vehicle.vehicleType.formFactor.toLowerCase()
             : "",
       };
@@ -46,19 +48,62 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
 
   return {
     ...state,
+    stations: {},
     vehicles,
     statistics: {
       numberOfVehicles: Object.keys(vehicles).length,
+      numberOfStations: 0,
     },
   };
 };
 
-const updateStations = (state: State, payload: Station[]) => {
+const updateStations = (state: State, payload: Station[], mapType: string) => {
   const stations = payload.reduce(
     (acc: Record<string, StationMapPoint>, station: Station) => {
       acc[station.id] = {
-        icon: "bicycle_parking",
         station,
+        icon: mapType === "ICONS" ? "bicycle_parking" : "",
+      };
+      return acc;
+    },
+    {}
+  );
+
+  return {
+    ...state,
+    vehicles: {},
+    stations,
+    statistics: {
+      numberOfVehicles: 0,
+      numberOfStations: Object.keys(stations).length,
+    },
+  };
+};
+
+const updateVehiclesAndStations = (
+  state: State,
+  payload: [Vehicle[], Station[]],
+  mapType: string
+) => {
+  const vehicles = payload[0].reduce(
+    (acc: Record<string, VehicleMapPoint>, vehicle: Vehicle) => {
+      acc[vehicle.id] = {
+        vehicle,
+        icon:
+          mapType === "ICONS"
+            ? vehicle.vehicleType.formFactor.toLowerCase()
+            : "",
+      };
+      return acc;
+    },
+    {}
+  );
+
+  const stations = payload[1].reduce(
+    (acc: Record<string, StationMapPoint>, station: Station) => {
+      acc[station.id] = {
+        station,
+        icon: mapType === "ICONS" ? "bicycle_parking" : "",
       };
       return acc;
     },
@@ -68,6 +113,11 @@ const updateStations = (state: State, payload: Station[]) => {
   return {
     ...state,
     stations,
+    vehicles,
+    statistics: {
+      numberOfVehicles: Object.keys(vehicles).length,
+      numberOfStations: Object.keys(stations).length,
+    },
   };
 };
 
@@ -76,7 +126,13 @@ const reducerFactory = (mapType: string) => (state: State, action: Action) => {
     case ActionType.UPDATE_VEHICLES:
       return updateVehicles(state, action?.payload! as Vehicle[], mapType);
     case ActionType.UPDATE_STATIONS:
-      return updateStations(state, action?.payload! as Station[]);
+      return updateStations(state, action?.payload! as Station[], mapType);
+    case ActionType.UPDATE_VEHICLES_AND_STATIONS:
+      return updateVehiclesAndStations(
+        state,
+        action?.payload! as [Vehicle[], Station[]],
+        mapType
+      );
   }
 };
 

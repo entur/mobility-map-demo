@@ -10,7 +10,12 @@ export const StatisticsList = memo(({ statistics }: Props) => {
     <>
       <Heading4>Statistics</Heading4>
       <UnorderedList>
-        <ListItem>Number of vehicles: {statistics.numberOfVehicles}</ListItem>
+        <ListItem>
+          Number of free floating vehicles: {statistics.numberOfVehicles}
+        </ListItem>
+        <ListItem>
+          Number of docking stations: {statistics.numberOfStations}
+        </ListItem>
       </UnorderedList>
     </>
   );

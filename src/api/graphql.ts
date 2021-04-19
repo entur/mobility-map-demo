@@ -122,15 +122,21 @@ const VEHICLE_FRAGMENT = gql`
   ${SYSTEM_FRAGMENT}
 `;
 
-const STATION_FRAGMENT = gql`
-  fragment StationFragment on Station {
+const STATION_BASE_FRAGMENT = gql`
+  fragment StationBaseFragment on Station {
     id
-    name
     lat
     lon
+    numBikesAvailable
+  }
+`;
+
+const STATION_FRAGMENT = gql`
+  fragment StationFragment on Station {
+    ...StationBaseFragment
+    name
     address
     capacity
-    numBikesAvailable
     numDocksAvailable
     isInstalled
     isRenting
@@ -143,11 +149,35 @@ const STATION_FRAGMENT = gql`
       ...PricingPlanFragment
     }
   }
+  ${STATION_BASE_FRAGMENT}
   ${PRICING_PLAN_FRAGMENT}
   ${SYSTEM_FRAGMENT}
 `;
 
 export const STATIONS_QUERY = gql`
+  query StationsQuery(
+    $lat: Float!
+    $lon: Float!
+    $range: Int!
+    $count: Int
+    $codespaces: [String]
+    $operators: [String]
+  ) {
+    stations(
+      lat: $lat
+      lon: $lon
+      range: $range
+      count: $count
+      codespaces: $codespaces
+      operators: $operators
+    ) {
+      ...StationBaseFragment
+    }
+  }
+  ${STATION_BASE_FRAGMENT}
+`;
+
+export const FULL_STATIONS_QUERY = gql`
   query StationsQuery(
     $lat: Float!
     $lon: Float!
@@ -230,6 +260,92 @@ export const FULL_VEHICLES_QUERY = gql`
     }
   }
   ${VEHICLE_FRAGMENT}
+`;
+
+export const HEATMAP_QUERY = gql`
+  query HeatmapQuery(
+    $lat: Float!
+    $lon: Float!
+    $range: Int!
+    $count: Int
+    $codespaces: [String]
+    $operators: [String]
+    $formFactors: [FormFactor]
+    $propulsionTypes: [PropulsionType]
+    $includeReserved: Boolean
+    $includeDisabled: Boolean
+  ) {
+    vehicles(
+      lat: $lat
+      lon: $lon
+      range: $range
+      count: $count
+      codespaces: $codespaces
+      operators: $operators
+      formFactors: $formFactors
+      propulsionTypes: $propulsionTypes
+      includeReserved: $includeReserved
+      includeDisabled: $includeDisabled
+    ) {
+      ...VehicleBaseFragment
+    }
+
+    stations(
+      lat: $lat
+      lon: $lon
+      range: $range
+      count: $count
+      codespaces: $codespaces
+      operators: $operators
+    ) {
+      ...StationBaseFragment
+    }
+  }
+  ${VEHICLE_BASE_FRAGMENT}
+  ${STATION_BASE_FRAGMENT}
+`;
+
+export const ICONS_QUERY = gql`
+  query HeatmapQuery(
+    $lat: Float!
+    $lon: Float!
+    $range: Int!
+    $count: Int
+    $codespaces: [String]
+    $operators: [String]
+    $formFactors: [FormFactor]
+    $propulsionTypes: [PropulsionType]
+    $includeReserved: Boolean
+    $includeDisabled: Boolean
+  ) {
+    vehicles(
+      lat: $lat
+      lon: $lon
+      range: $range
+      count: $count
+      codespaces: $codespaces
+      operators: $operators
+      formFactors: $formFactors
+      propulsionTypes: $propulsionTypes
+      includeReserved: $includeReserved
+      includeDisabled: $includeDisabled
+    ) {
+      ...VehicleFragment
+    }
+
+    stations(
+      lat: $lat
+      lon: $lon
+      range: $range
+      count: $count
+      codespaces: $codespaces
+      operators: $operators
+    ) {
+      ...StationFragment
+    }
+  }
+  ${VEHICLE_FRAGMENT}
+  ${STATION_FRAGMENT}
 `;
 
 export const CODESPACES_QUERY = gql`

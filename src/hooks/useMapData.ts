@@ -1,6 +1,9 @@
 import { useApolloClient } from "@apollo/client";
 import {
+  FULL_STATIONS_QUERY,
   FULL_VEHICLES_QUERY,
+  HEATMAP_QUERY,
+  ICONS_QUERY,
   STATIONS_QUERY,
   VEHICLES_QUERY,
 } from "api/graphql";
@@ -8,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import useMapDataReducer, { ActionType, State } from "./useMapDataReducer";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
 import { Filter } from "model/filter";
+import { SystemType } from "model/options";
 
 const DEFAULT_FETCH_POLICY = "no-cache";
 
@@ -15,24 +19,31 @@ export default function useVehicleData(
   viewState: InitialViewStateProps,
   radius: number,
   filter: Filter,
-  mapType: string
+  mapType: string,
+  systemTypes: Record<SystemType, boolean>
 ): [State, boolean, () => void] {
   const [loading, setLoading] = useState<boolean>(false);
   const [state, dispatch] = useMapDataReducer(mapType);
   const client = useApolloClient();
 
-  let query = FULL_VEHICLES_QUERY;
+  let query = HEATMAP_QUERY;
 
-  switch (mapType) {
-    case "VEHICLE_HEATMAP":
-      query = VEHICLES_QUERY;
-      break;
-    case "VEHICLE_ICONS":
-      query = FULL_VEHICLES_QUERY;
-      break;
-    case "STATIONS":
+  if (mapType === "HEATMAP") {
+    if (Object.values(systemTypes).filter((t) => t).length > 1) {
+      query = HEATMAP_QUERY;
+    } else if (systemTypes[SystemType.DOCKED]) {
       query = STATIONS_QUERY;
-      break;
+    } else if (systemTypes[SystemType.FREEFLOATING]) {
+      query = VEHICLES_QUERY;
+    }
+  } else if (mapType === "ICONS") {
+    if (Object.values(systemTypes).filter((t) => t).length > 1) {
+      query = ICONS_QUERY;
+    } else if (systemTypes[SystemType.DOCKED]) {
+      query = FULL_STATIONS_QUERY;
+    } else if (systemTypes[SystemType.FREEFLOATING]) {
+      query = FULL_VEHICLES_QUERY;
+    }
   }
 
   const refresh = useCallback(() => {
@@ -49,7 +60,12 @@ export default function useVehicleData(
         },
       });
       setLoading(false);
-      if (data && data.vehicles) {
+      if (data && data.vehicles && data.stations) {
+        dispatch({
+          type: ActionType.UPDATE_VEHICLES_AND_STATIONS,
+          payload: [data.vehicles, data.stations],
+        });
+      } else if (data && data.vehicles) {
         dispatch({
           type: ActionType.UPDATE_VEHICLES,
           payload: data.vehicles,
@@ -69,12 +85,7 @@ export default function useVehicleData(
   useEffect(() => {
     refresh();
     // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    refresh();
-    // eslint-disable-next-line
-  }, [filter, query]);
+  }, [filter, systemTypes, mapType, radius]);
 
   return [state, loading, refresh];
 }

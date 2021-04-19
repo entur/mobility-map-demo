@@ -29,6 +29,12 @@ export const ControlPanel = memo((props: Props) => {
       </div>
 
       <div className="control-panel-content">
+        <PrimaryButton loading={props.loading} onClick={() => props.refresh()}>
+          Refresh data
+        </PrimaryButton>
+      </div>
+
+      <div className="control-panel-content">
         <StatisticsList statistics={props.statistics} />
       </div>
 
@@ -38,12 +44,6 @@ export const ControlPanel = memo((props: Props) => {
 
       <div className="control-panel-content">
         <FiltersForm filter={props.filter} setFilter={props.setFilter} />
-      </div>
-
-      <div className="control-panel-content">
-        <PrimaryButton loading={props.loading} onClick={() => props.refresh()}>
-          Refresh data
-        </PrimaryButton>
       </div>
     </Contrast>
   );

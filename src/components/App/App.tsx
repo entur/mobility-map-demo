@@ -4,12 +4,13 @@ import "./App.scss";
 import useMapData from "hooks/useMapData";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
 import { ControlPanel } from "components/ControlPanel";
-import { Options } from "model/options";
+import { Options, SystemType } from "model/options";
 import { Filter } from "model/filter";
 
 const defaultOptions: Options = {
-  radius: 2500,
-  mapStyle: "VEHICLE_ICONS",
+  radius: 25000,
+  mapStyle: "HEATMAP",
+  systemTypes: { [SystemType.DOCKED]: true, [SystemType.FREEFLOATING]: true },
 };
 
 const defaultFilter: Filter = {
@@ -37,7 +38,8 @@ export const App = () => {
     viewState,
     options.radius!,
     filter,
-    options.mapStyle!
+    options.mapStyle!,
+    options.systemTypes
   );
 
   return (

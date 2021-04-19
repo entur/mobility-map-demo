@@ -1,7 +1,11 @@
 import { memo } from "react";
-import { SegmentedChoice, TextField } from "@entur/form";
+import {
+  MultipleSegmentedControl,
+  SegmentedChoice,
+  TextField,
+} from "@entur/form";
 import { Heading4 } from "@entur/typography";
-import { Options } from "model/options";
+import { Options, SystemType } from "model/options";
 import { SegmentedControl } from "@entur/form";
 
 type Props = {
@@ -20,12 +24,25 @@ export const OptionsForm = memo(({ options, setOptions }: Props) => {
         }
         selectedValue={options.mapStyle}
       >
-        <SegmentedChoice value="VEHICLE_HEATMAP">
-          Vehicle heatmap
-        </SegmentedChoice>
-        <SegmentedChoice value="VEHICLE_ICONS">Vehicle icons</SegmentedChoice>
-        <SegmentedChoice value="STATIONS">Vehicle stations</SegmentedChoice>
+        <SegmentedChoice value="HEATMAP">Heatmap</SegmentedChoice>
+        <SegmentedChoice value="ICONS">Icons</SegmentedChoice>
       </SegmentedControl>
+      <MultipleSegmentedControl
+        label="System types"
+        onChange={(systemTypes) => {
+          setOptions({
+            ...options,
+            systemTypes: systemTypes as Record<SystemType, boolean>,
+          });
+        }}
+        selectedValue={options.systemTypes}
+      >
+        <SegmentedChoice value={SystemType.DOCKED}>Docked</SegmentedChoice>
+        <SegmentedChoice value={SystemType.FREEFLOATING}>
+          Free floating
+        </SegmentedChoice>
+      </MultipleSegmentedControl>
+
       <TextField
         type="number"
         label="Radius (in meters)"

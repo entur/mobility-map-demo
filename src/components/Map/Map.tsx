@@ -16,6 +16,7 @@ import { PickInfo } from "@deck.gl/core/lib/deck";
 import { Vehicle } from "model/vehicle";
 import { TooltipContent } from "./TooltipContent";
 import { StationMapPoint } from "model/stationMapPoint";
+import { HeatmapPoint } from "model/heatmapPoint";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
@@ -48,15 +49,31 @@ export const Map = ({
     }),
   ];
 
-  if (mapStyle === "VEHICLE_HEATMAP") {
+  if (mapStyle === "HEATMAP") {
+    const points: HeatmapPoint[] = [
+      ...Object.values(vehicles).map((v: any) => ({
+        id: v.vehicle.id,
+        lat: v.vehicle.lat,
+        lon: v.vehicle.lon,
+        available: 1,
+      })),
+      ...Object.values(stations).map((s: any) => ({
+        id: s.station.id,
+        lat: s.station.lat,
+        lon: s.station.lon,
+        available: s.station.numBikesAvailable,
+      })),
+    ];
+
     layers.push(
-      new HeatmapLayer<VehicleMapPoint>({
+      new HeatmapLayer<HeatmapPoint>({
         id: "heatmap-layer",
-        data: Object.values(vehicles),
-        getPosition: (d) => [d.vehicle.lon, d.vehicle.lat],
+        data: points,
+        getPosition: (d) => [d.lon, d.lat],
+        getWeight: (d) => d.available,
       })
     );
-  } else if (mapStyle === "VEHICLE_ICONS") {
+  } else if (mapStyle === "ICONS") {
     layers.push(
       new IconLayer<VehicleMapPoint>({
         id: "icon-layer",
@@ -74,7 +91,6 @@ export const Map = ({
           setHoverInfo(info?.object?.vehicle),
       })
     );
-  } else if (mapStyle === "STATIONS") {
     layers.push(
       new IconLayer<StationMapPoint>({
         id: "station-layer",
@@ -113,7 +129,7 @@ export const Map = ({
             <TooltipContent vehicle={hoverInfo} />
           </Popup>
         )}
-        {mapStyle === "STATIONS" &&
+        {mapStyle === "ICONS" &&
           Object.values(stations).map((stationMapPoint: any) => {
             return (
               <Marker

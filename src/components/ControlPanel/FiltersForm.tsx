@@ -20,7 +20,7 @@ export const FiltersForm = memo(({ filter, setFilter }: Props) => {
 
   return (
     <>
-      <Heading4>Filters</Heading4>
+      <Heading4>Common filters</Heading4>
       <MultiSelect
         items={() => codespaces.map((v: string) => ({ label: v, value: v }))}
         selectedItem={filter.codespaces}
@@ -64,6 +64,8 @@ export const FiltersForm = memo(({ filter, setFilter }: Props) => {
           }
         }}
       />
+
+      <Heading4>Free floating filters</Heading4>
       <MultiSelect
         items={() =>
           Object.keys(FormFactor).map((v: string) => ({ label: v, value: v }))
