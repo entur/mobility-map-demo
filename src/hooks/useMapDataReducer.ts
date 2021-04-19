@@ -62,7 +62,7 @@ const updateStations = (state: State, payload: Station[], mapType: string) => {
     (acc: Record<string, StationMapPoint>, station: Station) => {
       acc[station.id] = {
         station,
-        icon: mapType === "ICONS" ? "bicycle_parking" : "",
+        icon: "bicycle_parking",
       };
       return acc;
     },
@@ -103,7 +103,7 @@ const updateVehiclesAndStations = (
     (acc: Record<string, StationMapPoint>, station: Station) => {
       acc[station.id] = {
         station,
-        icon: mapType === "ICONS" ? "bicycle_parking" : "",
+        icon: "bicycle_parking",
       };
       return acc;
     },
