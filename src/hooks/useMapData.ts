@@ -7,7 +7,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import useMapDataReducer, { ActionType, State } from "./useMapDataReducer";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
-import useDebounce from "./useDebounce";
 import { Filter } from "model/filter";
 
 const DEFAULT_FETCH_POLICY = "no-cache";
@@ -21,9 +20,6 @@ export default function useVehicleData(
   const [loading, setLoading] = useState<boolean>(false);
   const [state, dispatch] = useMapDataReducer(mapType);
   const client = useApolloClient();
-
-  const debouncedViewState = useDebounce(viewState, 500);
-  const debouncedRadius = useDebounce(radius, 500);
 
   let query = FULL_VEHICLES_QUERY;
 
@@ -49,9 +45,9 @@ export default function useVehicleData(
         query: query,
         fetchPolicy: DEFAULT_FETCH_POLICY,
         variables: {
-          lat: debouncedViewState.latitude,
-          lon: debouncedViewState.longitude,
-          range: debouncedRadius,
+          lat: viewState.latitude,
+          lon: viewState.longitude,
+          range: radius,
           ...filter,
         },
         context: {
@@ -76,11 +72,18 @@ export default function useVehicleData(
 
     abortController?.abort();
     update();
-  }, [client, dispatch, debouncedViewState, debouncedRadius, filter, query]);
+    // eslint-disable-next-line
+  }, [client, dispatch, viewState, viewState, filter, query]);
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line
+  }, [filter, query]);
 
   return [state, loading, refresh];
 }
