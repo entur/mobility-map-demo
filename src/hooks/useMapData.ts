@@ -37,10 +37,7 @@ export default function useVehicleData(
 
   const refresh = useCallback(() => {
     setLoading(true);
-    let abortController: AbortController | undefined;
     async function update() {
-      abortController = new AbortController();
-
       const { data } = await client.query({
         query: query,
         fetchPolicy: DEFAULT_FETCH_POLICY,
@@ -49,11 +46,6 @@ export default function useVehicleData(
           lon: viewState.longitude,
           range: radius,
           ...filter,
-        },
-        context: {
-          fetchOptions: {
-            signal: abortController.signal,
-          },
         },
       });
       setLoading(false);
@@ -70,7 +62,6 @@ export default function useVehicleData(
       }
     }
 
-    abortController?.abort();
     update();
     // eslint-disable-next-line
   }, [client, dispatch, viewState, viewState, filter, query]);
