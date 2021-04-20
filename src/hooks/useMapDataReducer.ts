@@ -15,6 +15,7 @@ export enum ActionType {
   UPDATE_VEHICLES,
   UPDATE_STATIONS,
   UPDATE_VEHICLES_AND_STATIONS,
+  CLEAR_DATA,
 }
 
 export type Action = {
@@ -133,6 +134,8 @@ const reducerFactory = (mapType: string) => (state: State, action: Action) => {
         action?.payload! as [Vehicle[], Station[]],
         mapType
       );
+    case ActionType.CLEAR_DATA:
+      return initialState;
   }
 };
 

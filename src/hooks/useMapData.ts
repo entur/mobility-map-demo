@@ -1,4 +1,4 @@
-import { useApolloClient } from "@apollo/client";
+import { DocumentNode, useApolloClient } from "@apollo/client";
 import {
   FULL_STATIONS_QUERY,
   FULL_VEHICLES_QUERY,
@@ -7,7 +7,7 @@ import {
   STATIONS_QUERY,
   VEHICLES_QUERY,
 } from "api/graphql";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useMapDataReducer, { ActionType, State } from "./useMapDataReducer";
 import { InitialViewStateProps } from "@deck.gl/core/lib/deck";
 import { Filter } from "model/filter";
@@ -24,9 +24,10 @@ export default function useVehicleData(
 ): [State, boolean, () => void] {
   const [loading, setLoading] = useState<boolean>(false);
   const [state, dispatch] = useMapDataReducer(mapType);
+  const abortController = useRef<AbortController | null>(null);
   const client = useApolloClient();
 
-  let query = HEATMAP_QUERY;
+  let query: DocumentNode | null = null;
 
   if (mapType === "HEATMAP") {
     if (Object.values(systemTypes).filter((t) => t).length > 1) {
@@ -49,14 +50,21 @@ export default function useVehicleData(
   const refresh = useCallback(() => {
     setLoading(true);
     async function update() {
+      abortController.current?.abort();
+      abortController.current = new AbortController();
       const { data } = await client.query({
-        query: query,
+        query: query!,
         fetchPolicy: DEFAULT_FETCH_POLICY,
         variables: {
           lat: viewState.latitude,
           lon: viewState.longitude,
           range: radius,
           ...filter,
+        },
+        context: {
+          fetchOptions: {
+            signal: abortController.current?.signal,
+          },
         },
       });
       setLoading(false);
@@ -78,9 +86,17 @@ export default function useVehicleData(
       }
     }
 
-    update();
+    if (query !== null) {
+      update();
+    } else {
+      dispatch({
+        type: ActionType.CLEAR_DATA,
+      });
+      setLoading(false);
+    }
+
     // eslint-disable-next-line
-  }, [client, dispatch, viewState, viewState, filter, query]);
+  }, [client, dispatch, viewState, radius, filter, query]);
 
   useEffect(() => {
     refresh();
