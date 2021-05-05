@@ -1,8 +1,10 @@
+import { TranslatedString } from "./translatedString";
+
 export type System = {
   id: string;
   language: string;
-  name: string;
-  shortName: string;
+  name: TranslatedString;
+  shortName: TranslatedString;
   operator: string;
   url: string;
   purchaseUrl: string;

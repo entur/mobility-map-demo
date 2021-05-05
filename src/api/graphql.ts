@@ -1,13 +1,25 @@
 import { gql } from "@apollo/client";
 
+const TRANSLATION_FRAGMENT = gql`
+  fragment TranslationFragment on TranslatedString {
+    translation {
+      language
+      value
+    }
+  }
+`;
+
 const VEHICLE_TYPE_FRAGMENT = gql`
   fragment VehicleTypeFragment on VehicleType {
     id
     formFactor
     propulsionType
     maxRangeMeters
-    name
+    name {
+      ...TranslationFragment
+    }
   }
+  ${TRANSLATION_FRAGMENT}
 `;
 
 const PRICING_SEGMENT_FRAGMENT = gql`
@@ -23,11 +35,15 @@ const PRICING_PLAN_FRAGMENT = gql`
   fragment PricingPlanFragment on PricingPlan {
     id
     url
-    name
+    name {
+      ...TranslationFragment
+    }
     currency
     price
     isTaxable
-    description
+    description {
+      ...TranslationFragment
+    }
     perKmPricing {
       ...PricingSegmentFragment
     }
@@ -37,6 +53,7 @@ const PRICING_PLAN_FRAGMENT = gql`
     surgePricing
   }
   ${PRICING_SEGMENT_FRAGMENT}
+  ${TRANSLATION_FRAGMENT}
 `;
 
 const RENTAL_URIS_FRAGMENT = gql`
@@ -70,9 +87,18 @@ const SYSTEM_FRAGMENT = gql`
   fragment SystemFragment on System {
     id
     language
-    name
-    shortName
-    operator
+    name {
+      ...TranslationFragment
+    }
+    shortName {
+      ...TranslationFragment
+    }
+    operator {
+      name {
+        ...TranslationFragment
+      }
+      id
+    }
     url
     purchaseUrl
     startDate
@@ -86,6 +112,7 @@ const SYSTEM_FRAGMENT = gql`
     }
   }
   ${RENTAL_APPS_FRAGMENT}
+  ${TRANSLATION_FRAGMENT}
 `;
 
 const VEHICLE_BASE_FRAGMENT = gql`
@@ -134,7 +161,9 @@ const STATION_BASE_FRAGMENT = gql`
 const STATION_FRAGMENT = gql`
   fragment StationFragment on Station {
     ...StationBaseFragment
-    name
+    name {
+      ...TranslationFragment
+    }
     address
     capacity
     numDocksAvailable
@@ -152,6 +181,7 @@ const STATION_FRAGMENT = gql`
   ${STATION_BASE_FRAGMENT}
   ${PRICING_PLAN_FRAGMENT}
   ${SYSTEM_FRAGMENT}
+  ${TRANSLATION_FRAGMENT}
 `;
 
 export const STATIONS_QUERY = gql`

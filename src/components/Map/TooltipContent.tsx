@@ -10,7 +10,10 @@ export const TooltipContent = ({ vehicle }: Props) => {
   return (
     <>
       <section style={{ textAlign: "left", minWidth: "100px", zIndex: 1000 }}>
-        <EmphasizedText>{vehicle.system.name}</EmphasizedText> (
+        <EmphasizedText>
+          {vehicle.system.name.translation[0].value}
+        </EmphasizedText>{" "}
+        (
         {vehicle.vehicleType.propulsionType
           .split("_")
           .join(" ")
@@ -37,7 +40,9 @@ export const TooltipContent = ({ vehicle }: Props) => {
             <br />
           </>
         )}
-        Price: {vehicle.pricingPlan.description}
+        Price: {vehicle.pricingPlan.description.translation[0].value}
+        <br />
+        ID: {vehicle.id}
         <br />
       </section>
     </>

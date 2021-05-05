@@ -1,11 +1,13 @@
+import { TranslatedString } from "./translatedString";
+
 export type PricingPlan = {
   id: string;
   url: string;
-  name: string;
+  name: TranslatedString;
   currency: string;
   price: number;
   isTaxable: boolean;
-  description: string;
+  description: TranslatedString;
   perKmPricing: [PricingSegment];
   perMinPricing: [PricingSegment];
   surgePricing: boolean;
