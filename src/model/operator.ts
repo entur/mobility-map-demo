@@ -1,6 +1,7 @@
 import { Codespace } from "./codespace";
+import { TranslatedString } from "./translatedString";
 
 export type Operator = {
-  name: string;
-  codespace: Codespace;
+  name: TranslatedString;
+  id: string;
 };

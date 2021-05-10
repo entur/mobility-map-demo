@@ -43,8 +43,8 @@ export const FiltersForm = memo(({ filter, setFilter }: Props) => {
       <MultiSelect
         items={() =>
           operators.map((v: Operator) => ({
-            label: `${v.name} (${v.codespace})`,
-            value: v.name,
+            label: `${v.name.translation[0].value}`,
+            value: v.id,
           }))
         }
         selectedItem={filter.operators}

@@ -387,8 +387,13 @@ export const CODESPACES_QUERY = gql`
 export const OPERATORS_QUERY = gql`
   query OperatorsQuery {
     operators {
-      name
-      codespace
+      id
+      name {
+        translation {
+          language
+          value
+        }
+      }
     }
   }
 `;

@@ -3,7 +3,7 @@ import { OPERATORS_QUERY } from "api/graphql";
 import { Operator } from "model/operator";
 import { useMemo } from "react";
 
-export default function useCodespaces() {
+export default function useOperators() {
   const { data } = useQuery(OPERATORS_QUERY);
 
   return useMemo(() => {
