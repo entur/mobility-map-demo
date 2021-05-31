@@ -1,14 +1,15 @@
-import React, { memo } from "react";
+import { PrimaryButton } from "@entur/button";
 import { Contrast } from "@entur/layout";
-import { Statistics } from "model/statistics";
+import { Link, SubParagraph } from "@entur/typography";
+import { Filter } from "model/filter";
 import { Options } from "model/options";
-import { StatisticsList } from "./StatisticsList";
-import { OptionsForm } from "./OptionsForm";
+import { Statistics } from "model/statistics";
+import { memo } from "react";
 import logo from "static/img/logo.png";
 import "./ControlPanel.scss";
-import { Filter } from "model/filter";
 import { FiltersForm } from "./FiltersForm";
-import { PrimaryButton } from "@entur/button";
+import { OptionsForm } from "./OptionsForm";
+import { StatisticsList } from "./StatisticsList";
 
 type Props = {
   statistics: Statistics;
@@ -26,6 +27,13 @@ export const ControlPanel = memo((props: Props) => {
       <div className="logo-wrapper">
         <img className="logo" src={logo} alt="Entur logo" />
         <span>Mobility Map Demo</span>
+        <SubParagraph>
+          This is a technical demonstration of{" "}
+          <Link href="https://developer.entur.org/pages-mobility-docs-mobility-v2">
+            Entur's National Mobility API
+          </Link>
+          , showing available vehicles for participating operators.
+        </SubParagraph>
       </div>
 
       <div className="control-panel-content">
