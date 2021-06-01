@@ -9,7 +9,7 @@ type Props = {
 export const TooltipContent = ({ vehicle }: Props) => {
   return (
     <>
-      <section style={{ textAlign: "left", minWidth: "100px", zIndex: 1000 }}>
+      <section style={{ textAlign: "left", minWidth: "100px" }}>
         <EmphasizedText>
           {vehicle.system.name.translation[0].value}
         </EmphasizedText>{" "}

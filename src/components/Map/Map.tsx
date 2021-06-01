@@ -118,17 +118,6 @@ export const Map = ({
         layers={layers}
         style={{ left: "400px", width: "calc(100% - 400px)" }}
       >
-        {hoverInfo && (
-          <Popup
-            key="hover"
-            closeButton={false}
-            longitude={hoverInfo.lon}
-            latitude={hoverInfo.lat}
-            anchor="bottom"
-          >
-            <TooltipContent vehicle={hoverInfo} />
-          </Popup>
-        )}
         {mapStyle === "ICONS" &&
           Object.values(stations).map((stationMapPoint: any) => {
             return (
@@ -141,6 +130,17 @@ export const Map = ({
               </Marker>
             );
           })}
+        {hoverInfo && (
+          <Popup
+            key="hover"
+            closeButton={false}
+            longitude={hoverInfo.lon}
+            latitude={hoverInfo.lat}
+            anchor="bottom"
+          >
+            <TooltipContent vehicle={hoverInfo} />
+          </Popup>
+        )}
         <StaticMap
           key="map"
           width="100%"
