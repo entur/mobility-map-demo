@@ -5,6 +5,9 @@ import { getGraphqlEndpoint, getSubscriptionsEndpoint } from "./config";
 
 const httpLink = new HttpLink({
   uri: getGraphqlEndpoint(),
+  headers: {
+    "ET-Client-Name": "entur-mobility-map",
+  },
 });
 
 const wsLink = new WebSocketLink({
