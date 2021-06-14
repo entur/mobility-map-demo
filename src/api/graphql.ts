@@ -397,3 +397,32 @@ export const OPERATORS_QUERY = gql`
     }
   }
 `;
+
+export const GEOFENCING_ZONES_QUERY = gql`
+  query GeofencingZonesQuery {
+    geofencingZones {
+      systemId
+      geojson {
+        type
+        features {
+          type
+          geometry {
+            type
+            coordinates
+          }
+          properties {
+            name
+            start
+            end
+            rules {
+              vehicleTypeIds
+              rideAllowed
+              rideThroughAllowed
+              maximumSpeedKph
+            }
+          }
+        }
+      }
+    }
+  }
+`;

@@ -2,12 +2,14 @@ import { PrimaryButton } from "@entur/button";
 import { Contrast } from "@entur/layout";
 import { Link, SubParagraph } from "@entur/typography";
 import { Filter } from "model/filter";
+import { GeofencingZonesOptions } from "model/geofencingZonesOptions";
 import { Options } from "model/options";
 import { Statistics } from "model/statistics";
 import { memo } from "react";
 import logo from "static/img/logo.png";
 import "./ControlPanel.scss";
 import { FiltersForm } from "./FiltersForm";
+import { GeofencingZonesOptionsForm } from "./GeofencingZonesOptionsForm";
 import { OptionsForm } from "./OptionsForm";
 import { StatisticsList } from "./StatisticsList";
 
@@ -17,6 +19,8 @@ type Props = {
   setOptions: (options: Options) => void;
   filter: Filter;
   setFilter: (filter: Filter) => void;
+  geofencingZonesOptions: GeofencingZonesOptions;
+  setGeofencingZonesOptions: (options: GeofencingZonesOptions) => void;
   loading: boolean;
   refresh: () => void;
 };
@@ -52,6 +56,13 @@ export const ControlPanel = memo((props: Props) => {
 
       <div className="control-panel-content">
         <FiltersForm filter={props.filter} setFilter={props.setFilter} />
+      </div>
+
+      <div className="control-panel-content geofencing-zones">
+        <GeofencingZonesOptionsForm
+          options={props.geofencingZonesOptions}
+          setOptions={props.setGeofencingZonesOptions}
+        />
       </div>
     </Contrast>
   );

@@ -17,11 +17,36 @@ import { Vehicle } from "model/vehicle";
 import { TooltipContent } from "./TooltipContent";
 import { StationMapPoint } from "model/stationMapPoint";
 import { HeatmapPoint } from "model/heatmapPoint";
+import { GeofencingZone, Feature } from "model/geofencingZone";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import { RGBAColor } from "deck.gl";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
 const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_MAP_STYLE = process.env.REACT_APP_MAPBOX_MAP_STYLE;
+
+const getFillColor = (rules: any): RGBAColor => {
+  if (rules.some((rule: any) => rule.maximumSpeedKph)) {
+    return [228, 255, 26, 50];
+  }
+
+  if (
+    rules.some((rule: any) => !rule.rideAllowed && !rule.rideThroughAllowed)
+  ) {
+    return [255, 87, 20, 50];
+  }
+
+  if (rules.some((rule: any) => !rule.rideAllowed && rule.rideThroughAllowed)) {
+    return [255, 184, 0, 50];
+  }
+
+  if (rules.some((rule: any) => rule.rideAllowed && rule.rideThroughAllowed)) {
+    return [190, 190, 50, 50];
+  }
+
+  return [255, 255, 255, 0];
+};
 
 export const Map = ({
   vehicles,
@@ -30,6 +55,7 @@ export const Map = ({
   setViewState,
   radius,
   mapStyle,
+  geofencingZonesOptions,
 }: any) => {
   const [hoverInfo, setHoverInfo] = useState<Vehicle | null>(null);
 
@@ -105,6 +131,31 @@ export const Map = ({
           stationMapPoint.station.lat,
         ],
       })
+    );
+  }
+
+  if (geofencingZonesOptions.enabled) {
+    geofencingZonesOptions.geofencingZones.forEach(
+      (geofencingZone: GeofencingZone) => {
+        if (
+          geofencingZonesOptions.selectedGeofencingZones.includes(
+            geofencingZone.systemId
+          )
+        ) {
+          layers.push(
+            new GeoJsonLayer<Feature>({
+              id: `geojson-layer-${geofencingZone.systemId}`,
+              data: geofencingZone.geojson as any,
+              filled: true,
+              extruded: false,
+              stroked: true,
+              pickable: true,
+              getLineWidth: 10,
+              getFillColor: (d) => getFillColor(d.properties.rules),
+            })
+          );
+        }
+      }
     );
   }
 
