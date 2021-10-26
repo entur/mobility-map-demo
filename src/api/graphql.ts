@@ -166,6 +166,11 @@ const STATION_FRAGMENT = gql`
     }
     address
     capacity
+    vehicleTypesAvailable {
+      vehicleType {
+        ...VehicleTypeFragment
+      }
+    }
     numDocksAvailable
     isInstalled
     isRenting
@@ -182,6 +187,7 @@ const STATION_FRAGMENT = gql`
   ${PRICING_PLAN_FRAGMENT}
   ${SYSTEM_FRAGMENT}
   ${TRANSLATION_FRAGMENT}
+  ${VEHICLE_TYPE_FRAGMENT}
 `;
 
 export const STATIONS_QUERY = gql`

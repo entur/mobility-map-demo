@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 import { Statistics } from "model/statistics";
-import { Vehicle } from "model/vehicle";
+import { FormFactor, Vehicle } from "model/vehicle";
 import { VehicleMapPoint } from "model/vehicleMapPoint";
 import { Station } from "model/station";
 import { StationMapPoint } from "model/stationMapPoint";
@@ -61,9 +61,14 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
 const updateStations = (state: State, payload: Station[], mapType: string) => {
   const stations = payload.reduce(
     (acc: Record<string, StationMapPoint>, station: Station) => {
+      const icon =
+        station?.vehicleTypesAvailable[0]?.vehicleType.formFactor ===
+        FormFactor.CAR
+          ? "car"
+          : "bicycle_parking";
       acc[station.id] = {
         station,
-        icon: "bicycle_parking",
+        icon,
       };
       return acc;
     },
