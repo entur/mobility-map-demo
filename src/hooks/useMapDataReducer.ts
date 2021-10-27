@@ -61,14 +61,12 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
 const updateStations = (state: State, payload: Station[], mapType: string) => {
   const stations = payload.reduce(
     (acc: Record<string, StationMapPoint>, station: Station) => {
-      const icon =
-        station?.vehicleTypesAvailable[0]?.vehicleType.formFactor ===
-        FormFactor.CAR
-          ? "car"
-          : "bicycle_parking";
+      const hasCar = station.vehicleTypesAvailable.some(
+        (vta) => vta.vehicleType.formFactor === FormFactor.CAR
+      );
       acc[station.id] = {
         station,
-        icon,
+        icon: hasCar ? "car" : "bicycle_parking",
       };
       return acc;
     },
