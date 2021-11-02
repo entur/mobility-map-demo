@@ -32,6 +32,11 @@ const initialState: State = {
   },
 };
 
+const hasCar = (station: Station) =>
+  station.vehicleTypesAvailable.some(
+    (vta) => vta.vehicleType?.formFactor === FormFactor.CAR
+  );
+
 const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
   const vehicles = payload.reduce(
     (acc: Record<string, VehicleMapPoint>, vehicle: Vehicle) => {
@@ -61,12 +66,14 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
 const updateStations = (state: State, payload: Station[], mapType: string) => {
   const stations = payload.reduce(
     (acc: Record<string, StationMapPoint>, station: Station) => {
-      const hasCar = station.vehicleTypesAvailable.some(
-        (vta) => vta.vehicleType.formFactor === FormFactor.CAR
-      );
       acc[station.id] = {
         station,
-        icon: hasCar ? "car" : "bicycle_parking",
+        icon:
+          mapType === "ICONS"
+            ? hasCar(station)
+              ? "car"
+              : "bicycle_parking"
+            : "",
       };
       return acc;
     },
