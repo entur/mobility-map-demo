@@ -11,8 +11,8 @@ import useGeofencingZones from "hooks/useGeofencingZones";
 import { GeofencingZone } from "model/geofencingZone";
 
 const defaultOptions: Options = {
-  radius: 25000,
-  mapStyle: "HEATMAP",
+  radius: 5000,
+  mapStyle: "ICONS",
   systemTypes: { [SystemType.DOCKED]: true, [SystemType.FREEFLOATING]: true },
 };
 
