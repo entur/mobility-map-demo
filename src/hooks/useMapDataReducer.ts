@@ -33,7 +33,7 @@ const initialState: State = {
 };
 
 const hasCar = (station: Station) =>
-  station.vehicleTypesAvailable.some(
+  station.vehicleTypesAvailable?.some(
     (vta) => vta.vehicleType?.formFactor === FormFactor.CAR
   );
 
