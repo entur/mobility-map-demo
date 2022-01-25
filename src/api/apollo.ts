@@ -1,19 +1,17 @@
-import { split, HttpLink, ApolloClient, InMemoryCache } from "@apollo/client";
-import { WebSocketLink } from "@apollo/client/link/ws";
+import {
+  split,
+  HttpLink,
+  ApolloClient,
+  InMemoryCache,
+  ApolloLink,
+} from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
-import { getGraphqlEndpoint, getSubscriptionsEndpoint } from "./config";
+import { getGraphqlEndpoint } from "./config";
 
 const httpLink = new HttpLink({
   uri: getGraphqlEndpoint(),
   headers: {
     "ET-Client-Name": "entur-mobility-map",
-  },
-});
-
-const wsLink = new WebSocketLink({
-  uri: getSubscriptionsEndpoint(),
-  options: {
-    reconnect: true,
   },
 });
 
@@ -25,7 +23,7 @@ const splitLink = split(
       definition.operation === "subscription"
     );
   },
-  wsLink,
+  ApolloLink.empty(),
   httpLink
 );
 
