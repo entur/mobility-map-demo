@@ -1,7 +1,9 @@
 {
   "name": "mobility-map-demo",
   "version": "0.1.0",
-  "private": true,
+  "description": "Demo application for mobility data",
+  "author": "entur/nrp",
+  "license": "EUPL-1.0",
   "dependencies": {
     "@apollo/client": "^3.3.4",
     "@danmarshall/deckgl-typings": "^4.4.0",
