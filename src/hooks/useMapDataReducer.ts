@@ -44,7 +44,9 @@ const updateVehicles = (state: State, payload: Vehicle[], mapType: string) => {
         vehicle,
         icon:
           mapType === "ICONS"
-            ? vehicle.vehicleType.formFactor.toLowerCase()
+            ? vehicle.vehicleType.formFactor.toLowerCase().startsWith("scooter")
+              ? "scooter"
+              : vehicle.vehicleType.formFactor.toLowerCase()
             : "",
       };
       return acc;
@@ -102,7 +104,9 @@ const updateVehiclesAndStations = (
         vehicle,
         icon:
           mapType === "ICONS"
-            ? vehicle.vehicleType.formFactor.toLowerCase()
+            ? vehicle.vehicleType.formFactor.toLowerCase().startsWith("scooter")
+              ? "scooter"
+              : vehicle.vehicleType.formFactor.toLowerCase()
             : "",
       };
       return acc;
