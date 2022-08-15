@@ -118,7 +118,12 @@ const updateVehiclesAndStations = (
     (acc: Record<string, StationMapPoint>, station: Station) => {
       acc[station.id] = {
         station,
-        icon: "bicycle_parking",
+        icon:
+          mapType === "ICONS"
+            ? hasCar(station)
+              ? "car"
+              : "bicycle_parking"
+            : "",
       };
       return acc;
     },
