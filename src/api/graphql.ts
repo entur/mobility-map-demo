@@ -170,6 +170,7 @@ const STATION_FRAGMENT = gql`
       vehicleType {
         ...VehicleTypeFragment
       }
+      count
     }
     numDocksAvailable
     isInstalled

@@ -1,5 +1,6 @@
 import { PricingPlan } from "./pricingPlan";
 import { System } from "./system";
+import { TranslatedString } from "./translatedString";
 
 export type Vehicle = {
   id: string;
@@ -19,7 +20,7 @@ export type VehicleType = {
   formFactor: FormFactor;
   propulsionType: PropulsionType;
   maxRangeMeters: number;
-  name: string;
+  name: TranslatedString;
 };
 
 export enum FormFactor {

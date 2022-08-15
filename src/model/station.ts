@@ -1,10 +1,11 @@
 import { PricingPlan } from "./pricingPlan";
 import { System } from "./system";
+import { TranslatedString } from "./translatedString";
 import { FormFactor, VehicleType } from "./vehicle";
 
 export type Station = {
   id: string;
-  name: string;
+  name: TranslatedString;
   lat: number;
   lon: number;
   address: string;
@@ -20,6 +21,7 @@ export type Station = {
   pricingPlans: PricingPlan[];
 };
 
-type VehicleTypeAvailability = {
+export type VehicleTypeAvailability = {
   vehicleType: VehicleType;
+  count: number;
 };

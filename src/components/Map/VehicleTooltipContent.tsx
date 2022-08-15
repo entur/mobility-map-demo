@@ -6,7 +6,7 @@ type Props = {
   full?: boolean;
 };
 
-export const TooltipContent = ({ vehicle }: Props) => {
+export const VehicleTooltipContent = ({ vehicle }: Props) => {
   return (
     <>
       <section style={{ textAlign: "left", minWidth: "100px" }}>

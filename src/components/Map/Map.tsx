@@ -14,12 +14,14 @@ import { HeatmapLayer } from "@deck.gl/aggregation-layers";
 import { useState } from "react";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { Vehicle } from "model/vehicle";
-import { TooltipContent } from "./TooltipContent";
+import { VehicleTooltipContent } from "./VehicleTooltipContent";
 import { StationMapPoint } from "model/stationMapPoint";
 import { HeatmapPoint } from "model/heatmapPoint";
 import { GeofencingZone, Feature } from "model/geofencingZone";
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { RGBAColor } from "deck.gl";
+import { Station } from "model/station";
+import { StationTooltipContent } from "./StationTooltipContent";
 
 const DEFAULT_STYLE =
   "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
@@ -57,7 +59,12 @@ export const Map = ({
   mapStyle,
   geofencingZonesOptions,
 }: any) => {
-  const [hoverInfo, setHoverInfo] = useState<Vehicle | null>(null);
+  const [vehicleHoverInfo, setVehicleHoverInfo] = useState<Vehicle | null>(
+    null
+  );
+  const [stationHoverInfo, setStationHoverInfo] = useState<Station | null>(
+    null
+  );
 
   const layers: any = [
     new ScatterplotLayer({
@@ -114,14 +121,14 @@ export const Map = ({
           vehicleMapPoint.vehicle.lat,
         ],
         onHover: (info: PickInfo<VehicleMapPoint>) =>
-          setHoverInfo(info?.object?.vehicle),
+          setVehicleHoverInfo(info?.object?.vehicle),
       })
     );
     layers.push(
       new IconLayer<StationMapPoint>({
         id: "station-layer",
         data: Object.values(stations),
-        pickable: false,
+        pickable: true,
         iconAtlas,
         iconMapping,
         getIcon: (d: StationMapPoint) => d.icon,
@@ -130,6 +137,8 @@ export const Map = ({
           stationMapPoint.station.lon,
           stationMapPoint.station.lat,
         ],
+        onHover: (info: PickInfo<StationMapPoint>) =>
+          setStationHoverInfo(info?.object?.station),
       })
     );
   }
@@ -181,15 +190,26 @@ export const Map = ({
               </Marker>
             );
           })}
-        {hoverInfo && (
+        {vehicleHoverInfo && (
           <Popup
             key="hover"
             closeButton={false}
-            longitude={hoverInfo.lon}
-            latitude={hoverInfo.lat}
+            longitude={vehicleHoverInfo.lon}
+            latitude={vehicleHoverInfo.lat}
             anchor="bottom"
           >
-            <TooltipContent vehicle={hoverInfo} />
+            <VehicleTooltipContent vehicle={vehicleHoverInfo} />
+          </Popup>
+        )}
+        {stationHoverInfo && (
+          <Popup
+            key="hover"
+            closeButton={false}
+            longitude={stationHoverInfo.lon}
+            latitude={stationHoverInfo.lat}
+            anchor="bottom"
+          >
+            <StationTooltipContent station={stationHoverInfo} />
           </Popup>
         )}
         <StaticMap
