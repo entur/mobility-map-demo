@@ -198,6 +198,8 @@ export const STATIONS_QUERY = gql`
     $count: Int
     $codespaces: [String]
     $operators: [String]
+    $formFactors: [FormFactor]
+    $propulsionTypes: [PropulsionType]
   ) {
     stations(
       lat: $lat
@@ -206,6 +208,8 @@ export const STATIONS_QUERY = gql`
       count: $count
       codespaces: $codespaces
       operators: $operators
+      availableFormFactors: $formFactors
+      availablePropulsionTypes: $propulsionTypes
     ) {
       ...StationBaseFragment
     }
@@ -221,6 +225,8 @@ export const FULL_STATIONS_QUERY = gql`
     $count: Int
     $codespaces: [String]
     $operators: [String]
+    $formFactors: [FormFactor]
+    $propulsionTypes: [PropulsionType]
   ) {
     stations(
       lat: $lat
@@ -229,6 +235,8 @@ export const FULL_STATIONS_QUERY = gql`
       count: $count
       codespaces: $codespaces
       operators: $operators
+      availableFormFactors: $formFactors
+      availablePropulsionTypes: $propulsionTypes
     ) {
       ...StationFragment
     }
@@ -333,6 +341,8 @@ export const HEATMAP_QUERY = gql`
       count: $count
       codespaces: $codespaces
       operators: $operators
+      availableFormFactors: $formFactors
+      availablePropulsionTypes: $propulsionTypes
     ) {
       ...StationBaseFragment
     }
@@ -376,6 +386,8 @@ export const ICONS_QUERY = gql`
       count: $count
       codespaces: $codespaces
       operators: $operators
+      availableFormFactors: $formFactors
+      availablePropulsionTypes: $propulsionTypes
     ) {
       ...StationFragment
     }

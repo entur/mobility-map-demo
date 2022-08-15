@@ -65,7 +65,6 @@ export const FiltersForm = memo(({ filter, setFilter }: Props) => {
         }}
       />
 
-      <Heading4>Free floating filters</Heading4>
       <MultiSelect
         items={() =>
           Object.keys(FormFactor).map((v: string) => ({ label: v, value: v }))
@@ -111,6 +110,9 @@ export const FiltersForm = memo(({ filter, setFilter }: Props) => {
           }
         }}
       />
+
+      <Heading4>Free floating filters</Heading4>
+
       <Switch
         checked={filter.includeReserved}
         onChange={(event) => {
