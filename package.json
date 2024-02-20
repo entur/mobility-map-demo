@@ -10,7 +10,7 @@
     "@deck.gl/aggregation-layers": "8.9.34",
     "@deck.gl/core": "8.3.10",
     "@deck.gl/layers": "8.3.10",
-    "@deck.gl/react": "8.9.33",
+    "@deck.gl/react": "8.9.34",
     "@entur/button": "2.4.0",
     "@entur/dropdown": "1.4.7",
     "@entur/form": "4.0.8",
