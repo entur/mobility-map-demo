@@ -29,7 +29,7 @@
     "@types/react-map-gl": "5.2.11",
     "axios": "0.28.0",
     "axios-hooks": "2.7.0",
-    "date-fns": "2.30.0",
+    "date-fns": "3.6.0",
     "firebase-tools": "9.23.3",
     "gl": "4.9.0",
     "graphql": "15.8.0",
