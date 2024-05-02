@@ -30,7 +30,7 @@
     "axios": "0.28.1",
     "axios-hooks": "2.7.0",
     "date-fns": "2.30.0",
-    "firebase-tools": "9.23.3",
+    "firebase-tools": "13.8.0",
     "gl": "4.9.0",
     "graphql": "15.8.0",
     "husky": "4.3.8",
