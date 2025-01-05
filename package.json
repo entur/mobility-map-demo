@@ -28,7 +28,7 @@
     "@types/react-dom": "16.9.25",
     "@types/react-map-gl": "5.2.11",
     "axios": "0.29.0",
-    "axios-hooks": "2.7.0",
+    "axios-hooks": "5.1.0",
     "date-fns": "2.30.0",
     "firebase-tools": "9.23.3",
     "gl": "4.9.2",
