@@ -213,7 +213,7 @@ function MapView() {
       <Box
         sx={{
           position: 'absolute',
-          top: 20,
+          top: 10,
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 1000,
