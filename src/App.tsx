@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from '@mui/material'
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, useQuery, gql } from '@apollo/client'
 import { MapContainer } from './components/MapContainer'
+import { Header } from './components/Header'
 import { Vehicle, Station, MapMode, Operator } from './types'
 import debounce from 'lodash/debounce'
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike'
@@ -222,7 +223,8 @@ function MapView() {
           p: 0.5,
           display: 'flex',
           flexDirection: 'column',
-          gap: 1
+          gap: 1,
+          minWidth: 200
         }}
       >
         <ToggleButtonGroup
@@ -267,6 +269,7 @@ function MapView() {
           </Select>
         </FormControl>
       </Box>
+      <Header />
       <MapContainer
         vehicles={mode === 'vehicles' ? vehiclesData?.vehicles || [] : []}
         stations={mode === 'stations' ? nonVirtualStations : []}
