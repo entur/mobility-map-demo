@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from '@mui/material'
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, useQuery, gql } from '@apollo/client'
 import { MapContainer } from './components/MapContainer'
@@ -15,18 +15,6 @@ const theme = createTheme({
       main: '#FF5959'
     }
   }
-})
-
-const httpLink = createHttpLink({
-  uri: 'https://api.entur.io/mobility/v2/graphql',
-  headers: {
-    'ET-Client-Name': 'entur-mobility-demo'
-  }
-})
-
-const client = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache()
 })
 
 const OPERATORS_QUERY = gql`
@@ -180,16 +168,13 @@ function MapView() {
   // Filter out virtual stations
   const nonVirtualStations = stationsData?.stations.filter(station => !station.isVirtualStation) || []
 
-  const debouncedSetBounds = useCallback(
-    debounce((newBounds: typeof bounds) => {
-      setBounds(newBounds)
-    }, 500),
-    []
-  )
+  const debouncedSetBounds = debounce((newBounds: typeof bounds) => {
+    setBounds(newBounds)
+  }, 500)
 
-  const handleViewportChange = useCallback((newBounds: typeof bounds) => {
+  const handleViewportChange = (newBounds: typeof bounds) => {
     debouncedSetBounds(newBounds)
-  }, [debouncedSetBounds])
+  }
 
   const handleModeChange = (_event: React.MouseEvent<HTMLElement>, newMode: MapMode) => {
     if (newMode !== null) {
@@ -281,6 +266,31 @@ function MapView() {
 }
 
 function App() {
+  const [config, setConfig] = useState<{ apiUrl: string } | null>(null)
+
+  useEffect(() => {
+    fetch('/bootstrap.json')
+      .then(response => response.json())
+      .then(config => setConfig(config))
+      .catch(error => console.error('Error loading configuration:', error))
+  }, [])
+
+  if (!config) {
+    return null // or a loading spinner
+  }
+
+  const httpLink = createHttpLink({
+    uri: config.apiUrl,
+    headers: {
+      'ET-Client-Name': 'entur-mobility-demo'
+    }
+  })
+
+  const client = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache()
+  })
+
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
