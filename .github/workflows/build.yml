@@ -20,4 +20,4 @@ jobs:
         with:
           name: build
           path: |
-            build
+            dist
