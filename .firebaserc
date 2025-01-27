@@ -1,7 +1,0 @@
-{
-  "projects": {
-    "dev": "mobility-map-demo-dev",
-    "staging": "mobility-map-demo-staging",
-    "prod": "mobility-map-demo-prod"
-  }
-}
