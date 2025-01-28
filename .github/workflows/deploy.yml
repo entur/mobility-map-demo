@@ -19,8 +19,10 @@ jobs:
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: build
-          path: build
+          path: dist
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy environment config
+        run: cp .github/environments/dev.json dist/bootstrap.json
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -36,8 +38,10 @@ jobs:
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: build
-          path: build
+          path: dist
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy environment config
+        run: cp .github/environments/staging.json dist/bootstrap.json
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -53,8 +57,10 @@ jobs:
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: build
-          path: build
+          path: dist
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy environment config
+        run: cp .github/environments/prod.json dist/bootstrap.json
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

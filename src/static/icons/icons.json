@@ -1,6 +1,0 @@
-{
-  "bicycle": { "x": 0, "y": 0, "width": 100, "height": 100 },
-  "bicycle_parking": { "x": 100, "y": 0, "width": 100, "height": 100 },
-  "car": { "x": 200, "y": 0, "width": 100, "height": 100 },
-  "scooter": { "x": 300, "y": 0, "width": 100, "height": 100 }
-}

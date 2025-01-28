@@ -11,11 +11,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v4
         with:
-          node-version: 10.24
-      - run: npm ci && npm run build
-      - uses: actions/setup-node@v4
-        with:
           node-version: 18.12
+      - run: npm ci && npm run build
+      - name: Copy environment config
+        run: cp .github/environments/dev.json dist/bootstrap.json
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
