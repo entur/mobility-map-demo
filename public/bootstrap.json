@@ -1,3 +1,4 @@
 {
-  "apiUrl": "https://api.dev.entur.io/mobility/v2/graphql"
+  "apiUrl": "http://localhost:8080/graphql",
+  "subscriptionUrl": "ws://localhost:8080/subscriptions"
 }

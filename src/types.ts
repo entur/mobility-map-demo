@@ -47,4 +47,39 @@ export interface Station {
   isVirtualStation: boolean
 }
 
+export enum UpdateType {
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE'
+}
+
+export interface VehicleUpdate {
+  vehicleId: string
+  updateType: UpdateType
+  vehicle: Vehicle | null
+}
+
+export interface StationUpdate {
+  stationId: string
+  updateType: UpdateType
+  station: Station | null
+}
+
 export type MapMode = 'vehicles' | 'stations'
+
+export interface SubscriptionStats {
+  connected: boolean
+  vehicleUpdates: {
+    creates: number
+    updates: number
+    deletes: number
+    total: number
+  }
+  stationUpdates: {
+    creates: number
+    updates: number
+    deletes: number
+    total: number
+  }
+  lastUpdateTime: number
+}

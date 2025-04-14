@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from '@mui/material'
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, useQuery, gql } from '@apollo/client'
+import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { useVehiclesAndStations } from './hooks/useVehiclesAndStations'
 import { MapContainer } from './components/MapContainer'
 import { Header } from './components/Header'
-import { Vehicle, Station, MapMode, Operator } from './types'
+import { MapMode } from './types'
 import debounce from 'lodash/debounce'
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike'
 import LocalParkingIcon from '@mui/icons-material/LocalParking'
@@ -17,108 +17,7 @@ const theme = createTheme({
   }
 })
 
-const OPERATORS_QUERY = gql`
-  query Operators {
-    operators {
-      id
-      name {
-        translation {
-          value
-          language
-        }
-      }
-    }
-  }
-`
 
-const VEHICLES_QUERY = gql`
-  query Vehicles(
-    $minimumLatitude: Float!
-    $maximumLatitude: Float!
-    $minimumLongitude: Float!
-    $maximumLongitude: Float!
-    $operators: [String]
-  ) {
-    vehicles(
-      minimumLatitude: $minimumLatitude
-      maximumLatitude: $maximumLatitude
-      minimumLongitude: $minimumLongitude
-      maximumLongitude: $maximumLongitude
-      operators: $operators
-    ) {
-      id
-      lat
-      lon
-      system {
-        operator {
-          name {
-            translation {
-              value
-              language
-            }
-          }
-        }
-      }
-      isReserved
-      isDisabled
-      vehicleType {
-        formFactor
-        propulsionType
-      }
-    }
-  }
-`
-
-const STATIONS_QUERY = gql`
-  query Stations(
-    $minimumLatitude: Float!
-    $maximumLatitude: Float!
-    $minimumLongitude: Float!
-    $maximumLongitude: Float!
-    $operators: [String]
-  ) {
-    stations(
-      minimumLatitude: $minimumLatitude
-      maximumLatitude: $maximumLatitude
-      minimumLongitude: $minimumLongitude
-      maximumLongitude: $maximumLongitude
-      operators: $operators
-    ) {
-      id
-      name {
-        translation {
-          value
-          language
-        }
-      }
-      lat
-      lon
-      system {
-        name {
-          translation {
-            value
-            language
-          }
-        }
-        operator {
-          name {
-            translation {
-              value
-              language
-            }
-          }
-        }
-      }
-      numBikesAvailable
-      numDocksAvailable
-      capacity
-      isInstalled
-      isRenting
-      isReturning
-      isVirtualStation
-    }
-  }
-`
 
 interface Viewport {
   minimumLatitude: number
@@ -129,44 +28,24 @@ interface Viewport {
 
 function MapView() {
   const [mode, setMode] = useState<MapMode>('vehicles')
-  const [selectedOperators, setSelectedOperators] = useState<string[]>([])
   const [bounds, setBounds] = useState<Viewport>({
     minimumLatitude: 59.9,
     maximumLatitude: 60.0,
     minimumLongitude: 10.7,
     maximumLongitude: 10.8,
   })
-
-  const { data: operatorsData } = useQuery<{ operators: Operator[] }>(
-    OPERATORS_QUERY
-  )
-
-  const { data: vehiclesData } = useQuery<{ vehicles: Vehicle[] }>(
-    VEHICLES_QUERY,
-    {
-      variables: { 
-        ...bounds, 
-        operators: selectedOperators.length > 0 ? selectedOperators : null 
-      },
-      pollInterval: 10000,
-      skip: mode !== 'vehicles'
-    }
-  )
-
-  const { data: stationsData } = useQuery<{ stations: Station[] }>(
-    STATIONS_QUERY,
-    {
-      variables: { 
-        ...bounds, 
-        operators: selectedOperators.length > 0 ? selectedOperators : null 
-      },
-      pollInterval: 30000,
-      skip: mode !== 'stations'
-    }
-  )
+  
+  // Use new hook for fetching and subscribing with bounding box
+  const { vehicles, stations, connectionStatus, updateStats } = useVehiclesAndStations(bounds);
 
   // Filter out virtual stations
-  const nonVirtualStations = stationsData?.stations.filter(station => !station.isVirtualStation) || []
+  const nonVirtualStations = stations.filter(station => !station.isVirtualStation)
+
+  useEffect(() => {
+    if (connectionStatus === 'connected' && (updateStats.vehicles % 10 === 0 || updateStats.stations % 10 === 0)) {
+      console.log('Connection:', connectionStatus, 'Vehicle updates:', updateStats.vehicles, 'Station updates:', updateStats.stations);
+    }
+  }, [connectionStatus, updateStats]);
 
   const debouncedSetBounds = debounce((newBounds: typeof bounds) => {
     setBounds(newBounds)
@@ -182,9 +61,6 @@ function MapView() {
     }
   }
 
-  const handleOperatorChange = (event: any) => {
-    setSelectedOperators(event.target.value as string[])
-  }
 
   return (
     <Box
@@ -228,35 +104,10 @@ function MapView() {
             Stations
           </ToggleButton>
         </ToggleButtonGroup>
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel id="operator-select-label" sx={{ lineHeight: '1em' }}>Operators</InputLabel>
-          <Select
-            labelId="operator-select-label"
-            id="operator-select"
-            multiple
-            value={selectedOperators}
-            onChange={handleOperatorChange}
-            input={<OutlinedInput sx={{ '.MuiSelect-select': { display: 'flex', alignItems: 'center' } }} label="Operators" />}
-            renderValue={(selected) => {
-              const selectedNames = selected.map(id => 
-                operatorsData?.operators.find(op => op.id === id)?.name.translation[0].value || id
-              )
-              return selectedNames.join(', ')
-            }}
-            size="small"
-          >
-            {operatorsData?.operators.map((operator) => (
-              <MenuItem key={operator.id} value={operator.id}>
-                <Checkbox checked={selectedOperators.includes(operator.id)} />
-                <ListItemText primary={operator.name.translation[0].value} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
       </Box>
       <Header />
       <MapContainer
-        vehicles={mode === 'vehicles' ? vehiclesData?.vehicles || [] : []}
+        vehicles={mode === 'vehicles' ? vehicles : []}
         stations={mode === 'stations' ? nonVirtualStations : []}
         mode={mode}
         onViewportChange={handleViewportChange}
@@ -266,40 +117,13 @@ function MapView() {
 }
 
 function App() {
-  const [config, setConfig] = useState<{ apiUrl: string } | null>(null)
-
-  useEffect(() => {
-    fetch('/bootstrap.json')
-      .then(response => response.json())
-      .then(config => setConfig(config))
-      .catch(error => console.error('Error loading configuration:', error))
-  }, [])
-
-  if (!config) {
-    return null // or a loading spinner
-  }
-
-  const httpLink = createHttpLink({
-    uri: config.apiUrl,
-    headers: {
-      'ET-Client-Name': 'entur-mobility-demo'
-    }
-  })
-
-  const client = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache()
-  })
-
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box sx={{ height: '100vh', width: '100vw' }}>
-          <MapView />
-        </Box>
-      </ThemeProvider>
-    </ApolloProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ height: '100vh', width: '100vw' }}>
+        <MapView />
+      </Box>
+    </ThemeProvider>
   )
 }
 

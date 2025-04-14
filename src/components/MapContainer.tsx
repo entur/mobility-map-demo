@@ -80,17 +80,48 @@ interface GeoPoint {
   lon: number
   type: 'vehicle' | 'station'
   data: Vehicle | Station
+  updateType?: 'create' | 'update' | 'delete'
 }
 
 export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: MapContainerProps) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
-  const markersRef = useRef<{ [key: string]: maplibregl.Marker & { isCluster?: boolean, clusterId?: number } }>({})
+  const markersRef = useRef<{ [key: string]: maplibregl.Marker & { isCluster?: boolean, clusterId?: number, element?: HTMLElement } }>({})
   const clusterRef = useRef<Supercluster<GeoJSON.Feature<GeoJSON.Point, ClusterProperties>, ClusterProperties>>()
+  const prevVehiclesRef = useRef<Vehicle[]>([])
+  const prevStationsRef = useRef<Station[]>([])
 
   useEffect(() => {
     const style = document.createElement('style')
-    style.textContent = popupStyle
+    style.textContent = popupStyle + `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+      
+      @keyframes popOut {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0); opacity: 0; }
+      }
+      
+      .marker-create {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      .marker-update {
+        animation: pulse 0.5s ease-in-out;
+      }
+      
+      .marker-delete {
+        animation: popOut 0.5s ease-in-out forwards;
+      }
+    `
     document.head.appendChild(style)
     return () => {
       document.head.removeChild(style)
@@ -206,24 +237,148 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
   const updateClusters = useCallback(() => {
     if (!map.current) return
 
-    // Clear existing markers
-    Object.values(markersRef.current).forEach(marker => marker.remove())
-    markersRef.current = {}
-
-    // Prepare points based on current mode
-    const points: GeoPoint[] = mode === 'vehicles' 
-      ? vehicles.map(v => ({ id: v.id, lat: v.lat, lon: v.lon, type: 'vehicle' as const, data: v }))
-      : stations.map(s => ({ id: s.id, lat: s.lat, lon: s.lon, type: 'station' as const, data: s }))
+    // Determine which items are new, updated, or deleted
+    const points: GeoPoint[] = []
+    const currentIds = new Set<string>()
+    
+    if (mode === 'vehicles') {
+      // Track previous vehicles for comparison
+      const prevVehicleIds = new Set(prevVehiclesRef.current.map(v => v.id))
+      const prevVehicleMap = new Map(prevVehiclesRef.current.map(v => [v.id, v]))
+      
+      vehicles.forEach(vehicle => {
+        currentIds.add(vehicle.id)
+        const prevVehicle = prevVehicleMap.get(vehicle.id)
+        
+        // Determine update type
+        let updateType: 'create' | 'update' | undefined
+        if (!prevVehicleIds.has(vehicle.id)) {
+          updateType = 'create'
+        } else if (
+          prevVehicle && (
+            prevVehicle.lat !== vehicle.lat ||
+            prevVehicle.lon !== vehicle.lon ||
+            prevVehicle.isReserved !== vehicle.isReserved ||
+            prevVehicle.isDisabled !== vehicle.isDisabled
+          )
+        ) {
+          updateType = 'update'
+        }
+        
+        points.push({
+          id: vehicle.id,
+          lat: vehicle.lat,
+          lon: vehicle.lon,
+          type: 'vehicle' as const,
+          data: vehicle,
+          updateType
+        })
+      })
+      
+      // Find deleted vehicles
+      prevVehiclesRef.current.forEach(vehicle => {
+        if (!currentIds.has(vehicle.id)) {
+          points.push({
+            id: vehicle.id,
+            lat: vehicle.lat,
+            lon: vehicle.lon,
+            type: 'vehicle' as const,
+            data: vehicle,
+            updateType: 'delete'
+          })
+        }
+      })
+      
+      // Update reference for next comparison
+      prevVehiclesRef.current = [...vehicles]
+    } else if (mode === 'stations') {
+      // Track previous stations for comparison
+      const prevStationIds = new Set(prevStationsRef.current.map(s => s.id))
+      const prevStationMap = new Map(prevStationsRef.current.map(s => [s.id, s]))
+      
+      stations.forEach(station => {
+        currentIds.add(station.id)
+        const prevStation = prevStationMap.get(station.id)
+        
+        // Determine update type
+        let updateType: 'create' | 'update' | undefined
+        if (!prevStationIds.has(station.id)) {
+          updateType = 'create'
+        } else if (
+          prevStation && (
+            prevStation.lat !== station.lat ||
+            prevStation.lon !== station.lon ||
+            prevStation.numBikesAvailable !== station.numBikesAvailable ||
+            prevStation.numDocksAvailable !== station.numDocksAvailable ||
+            prevStation.isInstalled !== station.isInstalled ||
+            prevStation.isRenting !== station.isRenting ||
+            prevStation.isReturning !== station.isReturning
+          )
+        ) {
+          updateType = 'update'
+        }
+        
+        points.push({
+          id: station.id,
+          lat: station.lat,
+          lon: station.lon,
+          type: 'station' as const,
+          data: station,
+          updateType
+        })
+      })
+      
+      // Find deleted stations
+      prevStationsRef.current.forEach(station => {
+        if (!currentIds.has(station.id)) {
+          points.push({
+            id: station.id,
+            lat: station.lat,
+            lon: station.lon,
+            type: 'station' as const,
+            data: station,
+            updateType: 'delete'
+          })
+        }
+      })
+      
+      // Update reference for next comparison
+      prevStationsRef.current = [...stations]
+    }
+    
+    // Handle markers that need to be deleted with animation
+    Object.entries(markersRef.current).forEach(([id, marker]) => {
+      const point = points.find(p => p.id === id)
+      if (point?.updateType === 'delete') {
+        if (marker.element) {
+          marker.element.classList.add('marker-delete')
+          // Remove marker after animation completes
+          setTimeout(() => {
+            marker.remove()
+            delete markersRef.current[id]
+          }, 500)
+        } else {
+          marker.remove()
+          delete markersRef.current[id]
+        }
+      } else if (!point) {
+        // Remove markers that are no longer in the dataset
+        marker.remove()
+        delete markersRef.current[id]
+      }
+    })
 
     if (points.length === 0) return
 
     // Initialize Supercluster
-    clusterRef.current = new Supercluster({
+    clusterRef.current = new Supercluster<GeoJSON.Feature<GeoJSON.Point, any>, ClusterProperties>({
       radius: 40,
       maxZoom: 16,
       map: (props) => ({
+        // @ts-ignore - Supercluster types don't match exactly with our usage
         count: props.count,
-        type: props.type
+        // @ts-ignore - Supercluster types don't match exactly with our usage
+        type: props.type as 'vehicle' | 'station'
       })
     })
 
@@ -236,10 +391,10 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
     const zoom = Math.floor(map.current.getZoom())
 
     // Get clusters
-    const clusters = clusterRef.current.getClusters(
+    const clusters = clusterRef.current?.getClusters(
       [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
       zoom
-    )
+    ) || []
 
     // Create markers for clusters and points
     clusters.forEach(cluster => {
@@ -248,10 +403,13 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
       const [longitude, latitude] = cluster.geometry.coordinates
       const properties = cluster.properties
 
+      // @ts-ignore - Supercluster types don't match exactly with our usage
       if (properties.cluster) {
+        // @ts-ignore - Supercluster types don't match exactly with our usage
         const element = createClusterMarkerElement(properties.point_count, mode)
         
         element.addEventListener('click', () => {
+          // @ts-ignore - Supercluster types don't match exactly with our usage
           handleClusterClick(properties.cluster_id, longitude, latitude)
         })
         element.style.cursor = 'pointer'
@@ -264,10 +422,14 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
 
         const clusterMarker = marker as maplibregl.Marker & { isCluster: boolean; clusterId: number }
         clusterMarker.isCluster = true
+        // @ts-ignore - Supercluster types don't match exactly with our usage
         clusterMarker.clusterId = properties.cluster_id
-        markersRef.current[cluster.id!] = clusterMarker
+        // @ts-ignore - Supercluster types don't match exactly with our usage
+        markersRef.current[cluster.id] = clusterMarker
       } else {
+        // @ts-ignore - Supercluster types don't match exactly with our usage
         const point = properties.data as Vehicle | Station
+        // @ts-ignore - Supercluster types don't match exactly with our usage
         const isStation = 'numBikesAvailable' in point
 
         const markerColor = isStation
@@ -289,15 +451,33 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
             : createVehiclePopupContent(point as Vehicle)
         )
 
+        // Create marker element with animation class if needed
+        const markerElement = document.createElement('div')
+        markerElement.style.width = '24px'
+        markerElement.style.height = '24px'
+        markerElement.style.borderRadius = '50%'
+        markerElement.style.backgroundColor = markerColor
+        
+        // Add animation class based on update type
+        // @ts-ignore - Supercluster types don't match exactly with our usage
+        const updateType = properties.data?.updateType
+        if (updateType) {
+          markerElement.classList.add(`marker-${updateType}`)
+        }
+        
         const marker = new maplibregl.Marker({
-          color: markerColor,
+          element: markerElement,
           scale: 0.8
         })
           .setLngLat([longitude, latitude])
           .setPopup(popup)
           .addTo(map.current)
-
-        markersRef.current[properties.id] = marker as any
+          
+        // Store reference to the element for animation updates
+        const markerWithElement = marker as maplibregl.Marker & { element: HTMLElement }
+        markerWithElement.element = markerElement
+        
+        markersRef.current[properties.id] = markerWithElement
       }
     })
   }, [mode, vehicles, stations, createGeoJSONFeatures, handleClusterClick])
@@ -402,6 +582,13 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
 
     const rafId = requestAnimationFrame(() => {
       updateClusters()
+      
+      // Log the number of vehicles/stations currently visible on the map
+      if (mode === 'vehicles') {
+        console.log(`Vehicles currently visible on map: ${vehicles.length}`)
+      } else if (mode === 'stations') {
+        console.log(`Stations currently visible on map: ${stations.length}`)
+      }
     })
 
     return () => {
