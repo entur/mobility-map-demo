@@ -43,7 +43,7 @@ function MapView() {
 
   useEffect(() => {
     if (connectionStatus === 'connected' && (updateStats.vehicles % 10 === 0 || updateStats.stations % 10 === 0)) {
-      console.log('Connection:', connectionStatus, 'Vehicle updates:', updateStats.vehicles, 'Station updates:', updateStats.stations);
+      console.log(new Date().toISOString(), '| Connection:', connectionStatus, 'Vehicle updates:', updateStats.vehicles, 'Station updates:', updateStats.stations);
     }
   }, [connectionStatus, updateStats]);
 

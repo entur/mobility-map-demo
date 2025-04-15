@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchGraphQL } from '../graphql/fetchGraphQL';
 import { createGraphQLWSClient, subscribeToUpdates } from '../graphql/graphqlWsClient';
 import { Vehicle, Station } from '../types';
 
@@ -89,7 +88,7 @@ export function useVehiclesAndStations(
           if (data?.vehicles) {
             setVehicles(prev => updateVehicleArray(prev, data.vehicles));
             setUpdateStats(stats => ({ ...stats, vehicles: stats.vehicles + 1 }));
-            console.log('[Vehicle Update]', data.vehicles);
+            console.log(new Date().toISOString(), '| [Vehicle Update]', data.vehicles);
           }
         },
         (err) => { setConnectionStatus('disconnected'); console.error(err); },
@@ -103,7 +102,7 @@ export function useVehiclesAndStations(
           if (data?.stations) {
             setStations(prev => updateStationArray(prev, data.stations));
             setUpdateStats(stats => ({ ...stats, stations: stats.stations + 1 }));
-            console.log('[Station Update]', data.stations);
+            console.log(new Date().toISOString(), '| [Station Update]', data.stations);
           }
         },
         (err) => { setConnectionStatus('disconnected'); console.error(err); },
