@@ -38,7 +38,7 @@ const OSM_STYLE = {
   ],
 } as any;
 
-export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: MapContainerProps) => {
+export const MapContainer = ({ vehicles, stations, onViewportChange }: MapContainerProps) => {
   const [viewState, setViewState] = React.useState({
     longitude: 10.75,
     latitude: 59.91,

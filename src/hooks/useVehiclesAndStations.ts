@@ -57,7 +57,10 @@ const STATIONS_SUBSCRIPTION = `
   }
 `;
 
-export function useVehiclesAndStations(bounds: { minimumLatitude: number; maximumLatitude: number; minimumLongitude: number; maximumLongitude: number; }) {
+export function useVehiclesAndStations(
+  bounds: { minimumLatitude: number; maximumLatitude: number; minimumLongitude: number; maximumLongitude: number; },
+  mode: 'vehicles' | 'stations'
+) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [stations, setStations] = useState<Station[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<'connecting'|'connected'|'disconnected'>('connecting');
@@ -65,50 +68,56 @@ export function useVehiclesAndStations(bounds: { minimumLatitude: number; maximu
 
   const wsClientRef = useRef<any>(null);
 
+  // Reset lists when subscription changes (mode or bounds)
   useEffect(() => {
-    // Setup WS client
+    setVehicles([]);
+    setStations([]);
+  }, [mode, bounds.minimumLatitude, bounds.maximumLatitude, bounds.minimumLongitude, bounds.maximumLongitude]);
+
+  useEffect(() => {
     const client = createGraphQLWSClient({ url: GRAPHQL_WS_URL });
     wsClientRef.current = client;
     setConnectionStatus('connecting');
 
-    // Vehicles subscription
-    const unsubVehicles = subscribeToUpdates(
-      client,
-      { query: VEHICLES_SUBSCRIPTION, variables: bounds },
-      (data: any) => {
-        if (data?.vehicles) {
-          setVehicles(prev => updateVehicleArray(prev, data.vehicles));
-          setUpdateStats(stats => ({ ...stats, vehicles: stats.vehicles + 1 }));
-          console.log('[Vehicle Update]', data.vehicles);
-        }
-      },
-      (err) => { setConnectionStatus('disconnected'); console.error(err); },
-      () => { setConnectionStatus('disconnected'); }
-    );
+    let unsub: (() => void) | undefined;
 
-    // Stations subscription
-    const unsubStations = subscribeToUpdates(
-      client,
-      { query: STATIONS_SUBSCRIPTION, variables: bounds },
-      (data: any) => {
-        if (data?.stations) {
-          setStations(prev => updateStationArray(prev, data.stations));
-          setUpdateStats(stats => ({ ...stats, stations: stats.stations + 1 }));
-          console.log('[Station Update]', data.stations);
-        }
-      },
-      (err) => { setConnectionStatus('disconnected'); console.error(err); },
-      () => { setConnectionStatus('disconnected'); }
-    );
+    if (mode === 'vehicles') {
+      unsub = subscribeToUpdates(
+        client,
+        { query: VEHICLES_SUBSCRIPTION, variables: bounds },
+        (data: any) => {
+          if (data?.vehicles) {
+            setVehicles(prev => updateVehicleArray(prev, data.vehicles));
+            setUpdateStats(stats => ({ ...stats, vehicles: stats.vehicles + 1 }));
+            console.log('[Vehicle Update]', data.vehicles);
+          }
+        },
+        (err) => { setConnectionStatus('disconnected'); console.error(err); },
+        () => { setConnectionStatus('disconnected'); }
+      );
+    } else if (mode === 'stations') {
+      unsub = subscribeToUpdates(
+        client,
+        { query: STATIONS_SUBSCRIPTION, variables: bounds },
+        (data: any) => {
+          if (data?.stations) {
+            setStations(prev => updateStationArray(prev, data.stations));
+            setUpdateStats(stats => ({ ...stats, stations: stats.stations + 1 }));
+            console.log('[Station Update]', data.stations);
+          }
+        },
+        (err) => { setConnectionStatus('disconnected'); console.error(err); },
+        () => { setConnectionStatus('disconnected'); }
+      );
+    }
 
     setConnectionStatus('connected');
 
     return () => {
-      unsubVehicles && unsubVehicles();
-      unsubStations && unsubStations();
+      unsub && unsub();
       client.dispose();
     };
-  }, [bounds.minimumLatitude, bounds.maximumLatitude, bounds.minimumLongitude, bounds.maximumLongitude]);
+  }, [bounds.minimumLatitude, bounds.maximumLatitude, bounds.minimumLongitude, bounds.maximumLongitude, mode]);
 
   return { vehicles, stations, connectionStatus, updateStats };
 }

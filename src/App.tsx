@@ -36,7 +36,7 @@ function MapView() {
   })
   
   // Use new hook for fetching and subscribing with bounding box
-  const { vehicles, stations, connectionStatus, updateStats } = useVehiclesAndStations(bounds);
+  const { vehicles, stations, connectionStatus, updateStats } = useVehiclesAndStations(bounds, mode);
 
   // Filter out virtual stations
   const nonVirtualStations = stations.filter(station => !station.isVirtualStation)
