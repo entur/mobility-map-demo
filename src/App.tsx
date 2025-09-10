@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
-import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText, Tooltip } from '@mui/material'
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, useQuery, gql } from '@apollo/client'
 import { MapContainer } from './components/MapContainer'
 import { Header } from './components/Header'
-import { Vehicle, Station, MapMode, Operator } from './types'
+import { Vehicle, Station, MapMode, Operator, GeofencingZones } from './types'
 import debounce from 'lodash/debounce'
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike'
 import LocalParkingIcon from '@mui/icons-material/LocalParking'
+import MapIcon from '@mui/icons-material/Map'
 
 const theme = createTheme({
   palette: {
@@ -50,7 +51,9 @@ const VEHICLES_QUERY = gql`
       lat
       lon
       system {
+        id
         operator {
+          id
           name {
             translation {
               value
@@ -94,6 +97,7 @@ const STATIONS_QUERY = gql`
       lat
       lon
       system {
+        id
         name {
           translation {
             value
@@ -101,6 +105,7 @@ const STATIONS_QUERY = gql`
           }
         }
         operator {
+          id
           name {
             translation {
               value
@@ -120,6 +125,38 @@ const STATIONS_QUERY = gql`
   }
 `
 
+const GEOFENCING_ZONES_QUERY = gql`
+  query GeofencingZones($systemIds: [ID]) {
+    geofencingZones(systemIds: $systemIds) {
+      systemId
+      geojson {
+        type
+        features {
+          type
+          properties {
+            name
+            start
+            end
+            rules {
+              vehicleTypeIds
+              rideStartAllowed
+              rideEndAllowed
+              rideThroughAllowed
+              maximumSpeedKph
+              stationParking
+            }
+            polylineEncodedMultiPolygon
+          }
+          geometry {
+            type
+            coordinates
+          }
+        }
+      }
+    }
+  }
+`
+
 interface Viewport {
   minimumLatitude: number
   maximumLatitude: number
@@ -130,6 +167,7 @@ interface Viewport {
 function MapView() {
   const [mode, setMode] = useState<MapMode>('vehicles')
   const [selectedOperators, setSelectedOperators] = useState<string[]>([])
+  const [showGeofencingZones, setShowGeofencingZones] = useState(false)
   const [bounds, setBounds] = useState<Viewport>({
     minimumLatitude: 59.9,
     maximumLatitude: 60.0,
@@ -165,6 +203,55 @@ function MapView() {
     }
   )
 
+  // Track unique system IDs in state to avoid unnecessary refetches
+  const [systemIdsForZones, setSystemIdsForZones] = useState<string[] | null>(null)
+  
+  // Update system IDs only when the actual set changes
+  useEffect(() => {
+    if (selectedOperators.length === 0) {
+      setSystemIdsForZones(null)
+      return
+    }
+    
+    const ids = new Set<string>()
+    
+    // Check vehicles
+    vehiclesData?.vehicles?.forEach(v => {
+      if (v.system?.id && v.system?.operator?.id && selectedOperators.includes(v.system.operator.id)) {
+        ids.add(v.system.id)
+      }
+    })
+    
+    // Check stations
+    stationsData?.stations?.forEach(s => {
+      if (s.system?.id && s.system?.operator?.id && selectedOperators.includes(s.system.operator.id)) {
+        ids.add(s.system.id)
+      }
+    })
+    
+    const newSystemIds = ids.size > 0 ? Array.from(ids).sort() : null
+    
+    // Only update if the system IDs have actually changed
+    setSystemIdsForZones(current => {
+      const currentStr = current ? current.sort().join(',') : ''
+      const newStr = newSystemIds ? newSystemIds.join(',') : ''
+      return currentStr !== newStr ? newSystemIds : current
+    })
+  }, [selectedOperators, vehiclesData, stationsData])
+
+  // Get geofencing zones for systems
+  const { data: geofencingData } = useQuery<{ geofencingZones: GeofencingZones[] }>(
+    GEOFENCING_ZONES_QUERY,
+    {
+      variables: {
+        systemIds: systemIdsForZones
+      },
+      skip: !showGeofencingZones,
+      // No polling needed - geofencing zones rarely change
+      pollInterval: 0
+    }
+  )
+
   // Filter out virtual stations
   const nonVirtualStations = stationsData?.stations.filter(station => !station.isVirtualStation) || []
 
@@ -183,7 +270,13 @@ function MapView() {
   }
 
   const handleOperatorChange = (event: any) => {
-    setSelectedOperators(event.target.value as string[])
+    const newOperators = event.target.value as string[]
+    setSelectedOperators(newOperators)
+    
+    // Auto-disable geofencing zones if more than one operator is selected
+    if (newOperators.length !== 1) {
+      setShowGeofencingZones(false)
+    }
   }
 
   return (
@@ -199,8 +292,7 @@ function MapView() {
         sx={{
           position: 'absolute',
           top: 10,
-          left: '50%',
-          transform: 'translateX(-50%)',
+          left: 10,
           zIndex: 1000,
           backgroundColor: 'white',
           borderRadius: 1,
@@ -253,6 +345,24 @@ function MapView() {
             ))}
           </Select>
         </FormControl>
+        <Tooltip 
+          title={selectedOperators.length !== 1 ? "Select exactly one operator to view geofencing zones" : ""}
+          placement="right"
+        >
+          <span>
+            <ToggleButton
+              value="geofencing"
+              selected={showGeofencingZones}
+              onChange={() => setShowGeofencingZones(!showGeofencingZones)}
+              size="small"
+              sx={{ mt: 1 }}
+              disabled={selectedOperators.length !== 1}
+            >
+              <MapIcon sx={{ mr: 1 }} />
+              Geofencing Zones
+            </ToggleButton>
+          </span>
+        </Tooltip>
       </Box>
       <Header />
       <MapContainer
@@ -260,6 +370,7 @@ function MapView() {
         stations={mode === 'stations' ? nonVirtualStations : []}
         mode={mode}
         onViewportChange={handleViewportChange}
+        geofencingZones={showGeofencingZones ? geofencingData?.geofencingZones || [] : []}
       />
     </Box>
   )
