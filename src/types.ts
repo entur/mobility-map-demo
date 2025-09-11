@@ -13,6 +13,7 @@ export interface Operator {
 }
 
 export interface System {
+  id: string
   name: TranslatedString
   operator?: Operator
 }
@@ -48,3 +49,39 @@ export interface Station {
 }
 
 export type MapMode = 'vehicles' | 'stations'
+
+export interface GeofencingZoneRule {
+  vehicleTypeIds?: string[]
+  rideStartAllowed: boolean
+  rideEndAllowed: boolean
+  rideThroughAllowed: boolean
+  maximumSpeedKph?: number
+  stationParking?: boolean
+}
+
+export interface GeofencingZoneProperties {
+  name?: string
+  start?: number
+  end?: number
+  rules?: GeofencingZoneRule[]
+  polylineEncodedMultiPolygon?: string[][]
+}
+
+export interface GeofencingZoneFeature {
+  type: 'Feature'
+  properties: GeofencingZoneProperties
+  geometry?: {
+    type: 'MultiPolygon' | 'Polygon'
+    coordinates: number[][][] | number[][][][]
+  }
+}
+
+export interface FeatureCollection {
+  type: 'FeatureCollection'
+  features: GeofencingZoneFeature[]
+}
+
+export interface GeofencingZones {
+  systemId: string
+  geojson: FeatureCollection
+}
