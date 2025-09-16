@@ -364,7 +364,8 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
         map.current = null
       }
     }
-  }, [onViewportChange])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!map.current) return
