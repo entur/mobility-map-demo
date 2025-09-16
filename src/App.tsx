@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from '@mui/material'
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, gql } from '@apollo/client'
-import { useQuery} from "@apollo/client/react"
+import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
+import { ApolloProvider, useQuery} from "@apollo/client/react"
 import { MapContainer } from './components/MapContainer'
 import { Header } from './components/Header'
 import { Vehicle, Station, MapMode, Operator } from './types'
@@ -145,9 +145,9 @@ function MapView() {
   const { data: vehiclesData } = useQuery<{ vehicles: Vehicle[] }>(
     VEHICLES_QUERY,
     {
-      variables: { 
-        ...bounds, 
-        operators: selectedOperators.length > 0 ? selectedOperators : null 
+      variables: {
+        ...bounds,
+        operators: selectedOperators.length > 0 ? selectedOperators : null
       },
       pollInterval: 10000,
       skip: mode !== 'vehicles'
@@ -157,9 +157,9 @@ function MapView() {
   const { data: stationsData } = useQuery<{ stations: Station[] }>(
     STATIONS_QUERY,
     {
-      variables: { 
-        ...bounds, 
-        operators: selectedOperators.length > 0 ? selectedOperators : null 
+      variables: {
+        ...bounds,
+        operators: selectedOperators.length > 0 ? selectedOperators : null
       },
       pollInterval: 30000,
       skip: mode !== 'stations'
@@ -239,7 +239,7 @@ function MapView() {
             onChange={handleOperatorChange}
             input={<OutlinedInput sx={{ '.MuiSelect-select': { display: 'flex', alignItems: 'center' } }} label="Operators" />}
             renderValue={(selected) => {
-              const selectedNames = selected.map(id => 
+              const selectedNames = selected.map(id =>
                 operatorsData?.operators.find(op => op.id === id)?.name.translation[0].value || id
               )
               return selectedNames.join(', ')
