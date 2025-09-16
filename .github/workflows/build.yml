@@ -14,7 +14,10 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22.19.0
-      - run: npm ci && npm run lint && npm run build
+      - run: npm ci
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+      - run: npm run lint && npm run build
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
