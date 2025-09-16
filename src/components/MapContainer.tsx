@@ -101,7 +101,7 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
     const status = vehicle.isDisabled ? 'disabled' :
                   vehicle.isReserved ? 'reserved' :
                   'available'
-    
+
     const statusText = vehicle.isDisabled ? 'Disabled' :
                       vehicle.isReserved ? 'Reserved' :
                       'Available'
@@ -134,13 +134,13 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
     const status = !station.isInstalled || !station.isRenting ? 'disabled' :
                   station.numBikesAvailable === 0 ? 'reserved' :
                   'available'
-    
+
     const statusText = !station.isInstalled ? 'Not Installed' :
                       !station.isRenting ? 'Not Renting' :
                       station.numBikesAvailable === 0 ? 'No Bikes Available' :
                       'Available'
 
-    const operatorName = station.system.operator 
+    const operatorName = station.system.operator
       ? getTranslatedName(station.system.operator.name)
       : 'Unknown Operator'
 
@@ -211,7 +211,7 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
     markersRef.current = {}
 
     // Prepare points based on current mode
-    const points: GeoPoint[] = mode === 'vehicles' 
+    const points: GeoPoint[] = mode === 'vehicles'
       ? vehicles.map(v => ({ id: v.id, lat: v.lat, lon: v.lon, type: 'vehicle' as const, data: v }))
       : stations.map(s => ({ id: s.id, lat: s.lat, lon: s.lon, type: 'station' as const, data: s }))
 
@@ -250,7 +250,7 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
 
       if (properties.cluster) {
         const element = createClusterMarkerElement(properties.point_count, mode)
-        
+
         element.addEventListener('click', () => {
           handleClusterClick(properties.cluster_id, longitude, latitude)
         })
@@ -364,14 +364,14 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
         map.current = null
       }
     }
-  }, [])
+  }, [onViewportChange])
 
   useEffect(() => {
     if (!map.current) return
 
     const handleMapMove = () => {
       if (!map.current) return
-      
+
       requestAnimationFrame(() => {
         updateClusters()
         const bounds = map.current?.getBounds()
@@ -428,6 +428,6 @@ const getTranslatedName = (translatedString: { translation: { value: string, lan
   const norwegianTranslation = translatedString.translation.find(t => t.language === 'nor')
   const englishTranslation = translatedString.translation.find(t => t.language === 'eng')
   const firstTranslation = translatedString.translation[0]
-  
+
   return (norwegianTranslation || englishTranslation || firstTranslation)?.value || 'Unknown'
 }
