@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, CssBaseline, ThemeProvider, createTheme, ToggleButton, ToggleButtonGroup, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Checkbox, ListItemText } from '@mui/material'
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, useQuery, gql } from '@apollo/client'
+import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, gql } from '@apollo/client'
+import { useQuery} from "@apollo/client/react"
 import { MapContainer } from './components/MapContainer'
 import { Header } from './components/Header'
 import { Vehicle, Station, MapMode, Operator } from './types'
