@@ -6,12 +6,14 @@ name: Deploy
 on:
   workflow_run:
     workflows: [Build]
+    branches: [master]
     types:
       - completed
 
 jobs:
   deploy_dev:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v5
       - name: Download all workflow run artifacts
@@ -31,6 +33,7 @@ jobs:
           projectId: mobility-map-demo-dev
   deploy_staging:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v5
       - name: Download all workflow run artifacts
@@ -50,6 +53,7 @@ jobs:
           projectId: mobility-map-demo-staging
   deploy_prod:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v5
       - name: Download all workflow run artifacts
