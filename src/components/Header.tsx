@@ -1,16 +1,16 @@
 import { Box, Typography, Link, IconButton, useMediaQuery, useTheme, Collapse } from '@mui/material'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import InfoIcon from '@mui/icons-material/Info'
 import CloseIcon from '@mui/icons-material/Close'
 
 export const Header = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [showDescription, setShowDescription] = useState(false)
-
-  useEffect(() => {
-    setShowDescription(!isMobile)
-  }, [isMobile])
+  const [expandedOnMobile, setExpandedOnMobile] = useState(false)
+  // Description is always shown on desktop; on mobile it is collapsed by
+  // default and toggled by the user. Deriving it during render avoids the
+  // effect-based state sync flagged by react-hooks/set-state-in-effect.
+  const showDescription = isMobile ? expandedOnMobile : true
 
   return (
     <Box
@@ -46,7 +46,7 @@ export const Header = () => {
         {isMobile && (
           <IconButton
             size="small"
-            onClick={() => setShowDescription(!showDescription)}
+            onClick={() => setExpandedOnMobile((prev) => !prev)}
             sx={{ color: 'white', ml: 1 }}
           >
             {showDescription ? <CloseIcon /> : <InfoIcon />}
