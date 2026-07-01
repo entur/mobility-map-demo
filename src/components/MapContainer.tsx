@@ -203,6 +203,23 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
     })
   }, [])
 
+  const createClusterMarkerElement = (count: number, mode: MapMode) => {
+    const element = document.createElement('div')
+    element.className = 'cluster-marker'
+    element.style.width = '30px'
+    element.style.height = '30px'
+    element.style.borderRadius = '50%'
+    element.style.backgroundColor = mode === 'vehicles' ? '#FF5959' : '#4A90E2'
+    element.style.color = 'white'
+    element.style.display = 'flex'
+    element.style.alignItems = 'center'
+    element.style.justifyContent = 'center'
+    element.style.fontSize = '14px'
+    element.style.fontWeight = 'bold'
+    element.innerText = count.toString()
+    return element
+  }
+
   const updateClusters = useCallback(() => {
     if (!map.current) return
 
@@ -301,23 +318,6 @@ export const MapContainer = ({ vehicles, stations, mode, onViewportChange }: Map
       }
     })
   }, [mode, vehicles, stations, createGeoJSONFeatures, handleClusterClick])
-
-  const createClusterMarkerElement = (count: number, mode: MapMode) => {
-    const element = document.createElement('div')
-    element.className = 'cluster-marker'
-    element.style.width = '30px'
-    element.style.height = '30px'
-    element.style.borderRadius = '50%'
-    element.style.backgroundColor = mode === 'vehicles' ? '#FF5959' : '#4A90E2'
-    element.style.color = 'white'
-    element.style.display = 'flex'
-    element.style.alignItems = 'center'
-    element.style.justifyContent = 'center'
-    element.style.fontSize = '14px'
-    element.style.fontWeight = 'bold'
-    element.innerText = count.toString()
-    return element
-  }
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return
