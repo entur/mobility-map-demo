@@ -1,0 +1,62 @@
+# publiccode.yml metadata, see https://yml.publiccode.tools/
+publiccodeYmlVersion: "0.7.0"
+
+name: Mobility Map Demo
+url: https://github.com/entur/mobility-map-demo
+
+platforms:
+  - web
+
+categories:
+  - data-visualization
+  - geographic-information-systems
+
+developmentStatus: beta
+softwareType: standalone/web
+
+organisation:
+  name: Entur AS
+  uri: https://entur.no
+
+usedBy:
+  - Norway (nationwide), Entur AS
+
+intendedAudience:
+  scope:
+    - transportation
+  countries:
+    - "NO"
+
+description:
+  en:
+    localisedName: Mobility Map Demo
+    shortDescription: Demo web app that plots shared mobility vehicles and stations on a map.
+    longDescription: >
+      Mobility Map Demo is a small reference application that shows how to consume Entur's shared mobility API.
+      It queries the vehicles and stations available in the current map viewport, switching between the two views,
+      and renders them as clustered markers on an interactive map. The underlying data is the aggregated GBFS feed
+      from city bike, scooter and car sharing operators that Lamassu collects.
+      The application exists to document the API by example: developers who want to build on Entur's shared
+      mobility data can read a complete, working client rather than assembling one from the API reference alone.
+      It is a demonstrator, not a production service.
+    documentation: https://github.com/entur/mobility-map-demo/blob/master/README.md
+    features:
+      - Shared mobility vehicles and stations on an interactive map
+      - Viewport-driven queries with marker clustering
+      - Example client for Entur's shared mobility GraphQL API
+      - Small, readable reference implementation
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Entur AS
+
+maintenance:
+  type: internal
+  contacts:
+    - name: Entur ROR (Open Data and Journey Planning)
+      email: kollektivdata@entur.org
+
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
