@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { Box } from '@mui/material'
-import maplibregl from 'maplibre-gl'
+import * as maplibregl from 'maplibre-gl'
 import Supercluster from 'supercluster'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Vehicle, Station, MapMode } from '../types'
